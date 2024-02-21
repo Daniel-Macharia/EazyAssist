@@ -41,9 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         vm = new VoskModel( getApplicationContext(), new Handler( Looper.getMainLooper()));
 
-        requestSendSMSPermission();
-        requestCallPermission();
-        requestRecordAudioPermission();
+        requestPermissions();
 
 
         TabLayout.Tab tab1 = tabs.newTab();
@@ -87,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void requestPermissions()
+    {
+        requestSendSMSPermission();
+        requestCallPermission();
+        requestReadContactPermission();
+        requestRecordAudioPermission();
     }
 
     private void requestRecordAudioPermission()
@@ -133,6 +139,14 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED )
         {
             ActivityCompat.requestPermissions( MainActivity.this, new String[]{Manifest.permission.CALL_PHONE}, 0);
+        }
+    }
+
+    private void requestReadContactPermission()
+    {
+        if( ActivityCompat.checkSelfPermission( this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED )
+        {
+            ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.READ_CONTACTS}, 1);
         }
     }
 }

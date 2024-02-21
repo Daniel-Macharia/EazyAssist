@@ -6,6 +6,7 @@ import android.os.Message;
 import android.text.method.ScrollingMovementMethod;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.vosk.Model;
 import org.vosk.Recognizer;
@@ -46,10 +47,16 @@ public class VoskModel implements RecognitionListener {
     }
 
     public void initModel() {
-        StorageService.unpack(getApplicationContext(), "model-en-us", "model_unpacked",
+        StorageService.unpack(getApplicationContext(), "model-en-us", "model",
                 (model) -> {
                     this.model = model;
+                    /*try {
+                        this.model = new Model("/assets/model_unpacked");
+                    } catch (IOException e) {
+                        Toast.makeText(getApplicationContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+                    }*/
                     setUiState(STATE_READY);
+                    Toast.makeText(getApplicationContext(), "Unpacked Model Successfully", Toast.LENGTH_SHORT).show();
                 },
                 (exception) -> setErrorState("Failed to unpack the model: " + exception.getMessage()));
     }
@@ -95,12 +102,12 @@ public class VoskModel implements RecognitionListener {
     @Override
     public void onPartialResult(String hypothesis) {
         //resultView.append(hypothesis + "\n");
-        handler.post(new Runnable() {
+        /*handler.post(new Runnable() {
             @Override
             public void run() {
                 RecognizeVoice.resultView.append(hypothesis + "\n");
             }
-        });
+        }); */
     }
 
     @Override

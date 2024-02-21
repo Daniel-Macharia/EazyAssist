@@ -132,7 +132,15 @@ public class AppFunctionsFragment extends Fragment {
         try {
             int n = 0;
             n = Integer.parseInt( contact );
-        }catch( Exception e )
+        }
+        catch( NumberFormatException n)
+        {
+            //if cannot be parsed to an int then it contains characters
+            //search user's contact list for a match
+            
+
+        }
+        catch( Exception e )
         {
             Toast.makeText(context, "Error: " + e, Toast.LENGTH_SHORT).show();
         }

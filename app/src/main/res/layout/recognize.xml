@@ -36,6 +36,7 @@
             android:textColor="@color/blue"
             android:inputType="textMultiLine"
             android:textSize="24sp"
+            android:gravity="bottom"
             />
 
     </ScrollView>
