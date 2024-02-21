@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cream"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <EditText
+            android:id="@+id/contact"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="2"
+            android:inputType="text"
+            android:hint="Enter phone number or contact name"
+            android:textColor="@color/blue"
+            android:textColorHint="@color/grey"
+            android:layout_margin="8dp"
+            />
+
+        <Button
+            android:id="@+id/call"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="call"
+            android:textSize="24sp"
+            android:textColor="@color/purple"
+            android:gravity="center"
+            android:background="@color/green"
+            android:layout_margin="8dp"
+            />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
+        <EditText
+            android:id="@+id/message"
+            android:layout_width="0dp"
+            android:layout_height="96dp"
+            android:layout_weight="2"
+            android:inputType="textAutoComplete"
+            android:hint="Enter message here"
+            android:textColor="@color/blue"
+            android:textColorHint="@color/grey"
+            android:layout_margin="8dp"
+            />
+
+        <Button
+            android:id="@+id/send"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="send"
+            android:textSize="24sp"
+            android:textColor="@color/purple"
+            android:gravity="center"
+            android:background="@color/green"
+            android:layout_margin="8dp"
+            />
+
+
+    </LinearLayout>
+
+
+
+</LinearLayout>
