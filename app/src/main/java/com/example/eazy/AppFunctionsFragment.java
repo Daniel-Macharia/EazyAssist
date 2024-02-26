@@ -7,7 +7,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.hardware.Camera;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.view.LayoutInflater;
@@ -52,12 +56,13 @@ public class AppFunctionsFragment extends Fragment {
             v.findViewById( R.id.call ).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    String num = number.getText().toString();
+                    //String num = number.getText().toString();
 
                     //make phone call
-                    callPhone( getNumber( num ) );
+                    //callPhone( getNumber( num ) );
 
-                    number.setText("");
+                    //number.setText("");
+                    turnOnFlashLight(true);
                 }
             });
 
@@ -65,13 +70,15 @@ public class AppFunctionsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
 
-                    String msg = message.getText().toString();
-                    String num = number.getText().toString();
+                    //String msg = message.getText().toString();
+                    //String num = number.getText().toString();
 
-                    sendTextMessage( getNumber( num ), msg );
+                    //sendTextMessage( getNumber( num ), msg );
 
-                    message.setText("");
-                    number.setText("");
+                    //message.setText("");
+                    //number.setText("");
+
+                    turnOnFlashLight(false);
                 }
             });
         }catch( Exception e )
@@ -224,5 +231,52 @@ public class AppFunctionsFragment extends Fragment {
         }
 
         return searchString;
+    }
+
+    private void turnOnFlashLight( boolean status)
+    {
+        try
+        {
+            if( getAppContext().getPackageManager().hasSystemFeature( PackageManager.FEATURE_CAMERA_FLASH) )
+            {
+                CameraManager cm = (CameraManager) getAppContext().getSystemService( Context.CAMERA_SERVICE );
+                String cameraId = cm.getCameraIdList()[0];
+
+                   if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M )
+                   {
+                       if( status )//turn on
+                       {
+                           cm.setTorchMode( cameraId, status);
+                       }
+                       else//turn off
+                       {
+                           cm.setTorchMode( cameraId, status);
+                       }
+                   }
+                   else //earlier that ap 23
+                   {
+                       Camera c = Camera.open();
+                       if( status )//turn on
+                       {
+                           Camera.Parameters p = c.getParameters();
+                           p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                           c.setParameters( p );
+                           c.startPreview();
+                       }
+                       else//turn off
+                       {
+                           c.stopPreview();
+                           c.release();
+                       }
+
+                   }
+            }else
+            {
+                Toast.makeText(getAppContext(), "Error: The system has no flash light", Toast.LENGTH_SHORT).show();
+            }
+        }catch( Exception e )
+        {
+            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
     }
 }

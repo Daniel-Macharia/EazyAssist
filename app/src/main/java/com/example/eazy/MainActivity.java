@@ -43,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
         requestPermissions();
 
+        EazySpeak es = new EazySpeak(getApplicationContext());
+        //es.speak("Hello World!");
+
 
         TabLayout.Tab tab1 = tabs.newTab();
         TabLayout.Tab tab2 = tabs.newTab();
