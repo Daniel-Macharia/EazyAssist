@@ -23,7 +23,7 @@
             />
     </LinearLayout>
 
-    <ScrollView
+    <!-- ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
@@ -39,6 +39,17 @@
             android:gravity="bottom"
             />
 
-    </ScrollView>
+    </ScrollView -->
+
+    <TextView
+        android:id="@+id/result"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6"
+        android:textColor="@color/blue"
+        android:inputType="textMultiLine"
+        android:textSize="24sp"
+        android:gravity="bottom"
+        />
 
 </LinearLayout>

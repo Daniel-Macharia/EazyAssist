@@ -2,9 +2,12 @@ package com.example.eazy;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.Camera;
@@ -33,6 +36,10 @@ public class AppFunctionsFragment extends Fragment {
 
     private Context context;
 
+    private SwitchFlashLight sf;
+    private SaveContact sc;
+    private CallPhone cp;
+
     public AppFunctionsFragment(Context context){
         this.context = context;
     }
@@ -41,6 +48,12 @@ public class AppFunctionsFragment extends Fragment {
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
+        sf = new SwitchFlashLight(getAppContext());
+
+        BroadcastReceiver smsReceiver = new SentReceivedBroadcastReceiver( getAppContext() );
+
+        getAppContext().registerReceiver(smsReceiver, new IntentFilter( "SMS_SENT") );
+        getAppContext().registerReceiver(smsReceiver, new IntentFilter( "SMS_RECIEVED") );
     }
 
     @Nullable
@@ -50,37 +63,55 @@ public class AppFunctionsFragment extends Fragment {
 
         try {
 
-            EditText number, message;
-            number = v.findViewById( R.id.contact );
-            message = v.findViewById( R.id.message );
+            EditText num = v.findViewById( R.id.number );
+            EditText name = v.findViewById( R.id.name );
+
+
+            EditText number = v.findViewById( R.id.smsNumber );
+            EditText message = v.findViewById( R.id.smsMessage );
+
+            EditText callNumber = v.findViewById( R.id.callNumber );
+
             v.findViewById( R.id.call ).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //String num = number.getText().toString();
+                    String num = callNumber.getText().toString();
 
-                    //make phone call
-                    //callPhone( getNumber( num ) );
-
-                    //number.setText("");
-                    turnOnFlashLight(true);
+                    cp = new CallPhone( getAppContext(), "", num);
+                    cp.callPhone();
                 }
             });
 
             v.findViewById( R.id.send ).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String num = number.getText().toString();
+                    String mes = message.getText().toString();
 
-                    //String msg = message.getText().toString();
-                    //String num = number.getText().toString();
-
-                    //sendTextMessage( getNumber( num ), msg );
-
-                    //message.setText("");
-                    //number.setText("");
-
-                    turnOnFlashLight(false);
+                    SendSMSMessage sm = new SendSMSMessage( getAppContext(), "", num, mes);
+                    sm.sendSMSMessage();
                 }
             });
+
+            v.findViewById( R.id.switchTorch ).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sf.switchFlashlight();
+                }
+            });
+
+            v.findViewById( R.id.saveContact ).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    String contactNumber = num.getText().toString();
+                    String contactName = name.getText().toString();
+
+                    sc = new SaveContact( getContext(), contactName, contactNumber);
+                    sc.saveContact();
+                }
+            });
+
         }catch( Exception e )
         {
             Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
@@ -94,83 +125,75 @@ public class AppFunctionsFragment extends Fragment {
         return this.context;
     }
 
-    private void callPhone( String number )
+}
+/*
+interface Functionality
+{
+
+    Context getAppContext();
+    void giveResponse();
+} */
+
+class Contact
+{
+    private String name;
+    private String number;
+    private Context context;
+    public Contact(Context context, String name, String number)
     {
-
-        if( number == null )
-            return;
-
-        Intent callIntent = new Intent(Intent.ACTION_CALL);
-        callIntent.setData(Uri.parse("tel:" + number));
-
-        if(ActivityCompat.checkSelfPermission( getAppContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED )
-        {
-            Toast.makeText(context, "Call Permission denied!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        startActivity( callIntent );
+        this.context = context;
+        this.name = name;
+        this.number = number;
     }
 
-    private void sendTextMessage(String number, String message )
+    private Context getAppContext(){return this.context;}
+
+    public void setName( String name )
     {
-        if( number == null )
-            return;
-
-        try{
-            if( ActivityCompat.checkSelfPermission( getAppContext(), android.Manifest.permission.SEND_SMS )
-                    != PackageManager.PERMISSION_GRANTED )
-            {
-                //ActivityCompat.requestPermissions( getAppContext(), new String[]{Manifest.permission.SEND_SMS}, 0);
-                Toast.makeText(context, "Send SMS Permission Denied!", Toast.LENGTH_SHORT).show();
-            }
-
-            Intent s = new Intent("SMS_SENT");
-            s.putExtra("recipient", number);
-            Intent d = new Intent("SMS_DELIVERED");
-            d.putExtra("recipient", number);
-            PendingIntent sentIntent = PendingIntent.getBroadcast(getAppContext(), 0, s, 0);
-            PendingIntent deliveredIntent = PendingIntent.getBroadcast(getAppContext(), 0, d, 0);
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(number, null, message, sentIntent, deliveredIntent);
-
-        }
-        catch( Exception e )
-        {
-            Toast.makeText( getAppContext(), e.toString(), Toast.LENGTH_SHORT).show();
-        }
+        this.name = name;
     }
 
-    private String getNumber( String contact )
+    public void setNumber(String number )
     {
-        try {
-            int n = 0;
-            n = Integer.parseInt( contact );
-        }
-        catch( NumberFormatException n)
+        this.number = number;
+    }
+
+    public String getName()
+    {
+        return this.name;
+    }
+
+    public String getNumber()
+    {
+        if( this.number == null )//when number is null
         {
-            //if cannot be parsed to an int then it contains characters
-            //search user's contact list for a match
-            //getLoaderManager().initLoader(0, null, this);
-            searchContact( contact );
+            searchNumber( getName() );
             return null;
         }
-        catch( Exception e )
+
+        try//when number is a string insted
         {
-            Toast.makeText(context, "Error: " + e, Toast.LENGTH_SHORT).show();
+
+            int n = 0;
+            n = Integer.parseInt( this.number );
+
+        }catch( NumberFormatException e )
+        {
+            searchNumber( this.number );
+            return null;
         }
 
-        return contact;
+        return this.number;
     }
 
-    private String searchContact(String searchString)
+    public String searchNumber( String name )
     {
         try {
 
             String []projection = { ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, ContactsContract.Contacts.Data._ID};
             String whereClause = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? ";
 
-            String []selectionArgs = { "%" + searchString + "%"};
+            String []selectionArgs = { "%" + name + "%"};
 
             ContentResolver cr = getAppContext().getContentResolver();
 
@@ -223,60 +246,277 @@ public class AppFunctionsFragment extends Fragment {
 
             cursor.close();
 
-            Toast.makeText(context, "Found:\n" + data, Toast.LENGTH_LONG).show();
+            Toast.makeText(getAppContext(), "Found:\n" + data, Toast.LENGTH_LONG).show();
 
         }catch(Exception e )
         {
-            Toast.makeText(context, "Error: " + e, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
         }
 
-        return searchString;
+        return name;
+    }
+}
+
+class SaveContact// implements Functionality
+{
+    private Context context;
+
+    private String name, number;
+    public SaveContact( Context context, String name, String number )
+    {
+        this.context = context;
+        this.name = name;
+        this.number = number;
     }
 
-    private void turnOnFlashLight( boolean status)
+    private void setName( String name )
+    {
+        this.name = name;
+    }
+
+    private void setNumber( String number )
+    {
+        this.number = number;
+    }
+
+    private String getName(){return this.name;}
+    private String getNumber(){return this.number;}
+
+    public void saveContact()
     {
         try
         {
-            if( getAppContext().getPackageManager().hasSystemFeature( PackageManager.FEATURE_CAMERA_FLASH) )
+            ContentResolver cr = getAppContext().getContentResolver();
+
+            ContentValues cv = new ContentValues();
+            Uri url = ContactsContract.Contacts.CONTENT_URI;
+
+            cv.put(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, getName() );
+            //cv.put( ContactsContract.CommonDataKinds.Phone.NUMBER, getNumber() );
+
+            cr.insert( url, cv );
+
+        }catch (Exception e )
+        {
+            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
+
+        Toast.makeText(getAppContext(), "Saving Contact " + getNumber() + " as " + getName(), Toast.LENGTH_SHORT).show();
+    }
+
+   // @Override
+    public Context getAppContext(){return this.context;}
+
+   // @Override
+    public void giveResponse()
+    {
+
+    }
+}
+
+class CallPhone //implements Functionality
+{
+    private Contact contact;
+    private Context context;
+    public CallPhone(Context context, String name, String number)
+    {
+        contact = new Contact(context, name, number);
+        this.context = context;
+    }
+
+   // @Override
+    public Context getAppContext()
+    {
+        return this.context;
+    }
+
+    public void callPhone()
+    {
+        try
+        {
+            if( contact.getNumber() == null )
+                return;
+
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            callIntent.setData(Uri.parse("tel:" + contact.getNumber()));
+
+            if(ActivityCompat.checkSelfPermission( getAppContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED )
+            {
+                Toast.makeText(getAppContext(), "Call Permission denied!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            getAppContext().startActivity( callIntent );
+        }catch(Exception e )
+        {
+            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+   // @Override
+    public void giveResponse()
+    {
+
+    }
+}
+
+class SendSMSMessage //extends BroadcastReceiver //implements Functionality
+{
+    private Contact contact;
+    private String message;
+    private Context context;
+
+    public SendSMSMessage(Context context, String name, String number, String message) {
+        try
+        {
+            this.context = context;
+            this.contact = new Contact(context, name, number);
+            this.message = message;
+        }catch( Exception e )
+        {
+            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public String getMessage() {
+        return this.message;
+    }
+
+    public void sendSMSMessage() {
+        if (contact.getNumber() == null)
+            return;
+
+        try {
+            if (ActivityCompat.checkSelfPermission(getAppContext(), android.Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                //ActivityCompat.requestPermissions( getAppContext(), new String[]{Manifest.permission.SEND_SMS}, 0);
+                Toast.makeText(getAppContext(), "Send SMS Permission Denied!", Toast.LENGTH_SHORT).show();
+            }
+
+            Intent sent = new Intent("SMS_SENT");
+            sent.putExtra("recipient", contact.getNumber());
+            Intent delivered = new Intent("SMS_DELIVERED");
+            delivered.putExtra("recipient", contact.getNumber());
+            PendingIntent sentIntent = PendingIntent.getBroadcast(getAppContext(), 0, sent, 0);
+            PendingIntent deliveredIntent = PendingIntent.getBroadcast(getAppContext(), 0, delivered, 0);
+            SmsManager smsManager = SmsManager.getDefault();
+            smsManager.sendTextMessage(contact.getNumber(), null, getMessage(), sentIntent, deliveredIntent);
+
+        } catch (Exception e) {
+            Toast.makeText(getAppContext(), e.toString(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // @Override
+    public Context getAppContext() {
+        return this.context;
+    }
+
+    //@Override
+    public void giveResponse() {
+
+    }
+
+}
+
+class SentReceivedBroadcastReceiver extends BroadcastReceiver
+{
+    private String sent;
+    private String received;
+    private Context context;
+    public SentReceivedBroadcastReceiver(Context context)
+    {
+        sent = "SMS_SENT";
+        received = "SMS_RECEIVED";
+        this.context = context;
+    }
+
+    private Context getContext(){return this.context;}
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        //display delivery and sent reports
+        String action = intent.getAction();
+
+        if( action.equals( sent ) )
+        {
+            Toast.makeText(getContext(), "Message Sent!", Toast.LENGTH_SHORT).show();
+        }
+        else if( action.equals( received ) )
+        {
+            Toast.makeText(getContext(), "Message Delivered!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+}
+class SwitchFlashLight// implements Functionality
+{
+    private Context context;
+    private static boolean status;
+    public SwitchFlashLight(Context context)
+    {
+        this.context = context;
+        status = false;
+    }
+
+    private void setState( boolean state )
+    {
+        status = state;
+    }
+
+    private boolean getState(){return status;}
+
+    public void switchFlashlight()
+    {
+        try
+        {
+            if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M )
             {
                 CameraManager cm = (CameraManager) getAppContext().getSystemService( Context.CAMERA_SERVICE );
                 String cameraId = cm.getCameraIdList()[0];
 
-                   if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.M )
-                   {
-                       if( status )//turn on
-                       {
-                           cm.setTorchMode( cameraId, status);
-                       }
-                       else//turn off
-                       {
-                           cm.setTorchMode( cameraId, status);
-                       }
-                   }
-                   else //earlier that ap 23
-                   {
-                       Camera c = Camera.open();
-                       if( status )//turn on
-                       {
-                           Camera.Parameters p = c.getParameters();
-                           p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                           c.setParameters( p );
-                           c.startPreview();
-                       }
-                       else//turn off
-                       {
-                           c.stopPreview();
-                           c.release();
-                       }
+                cm.setTorchMode( cameraId, getState() );
 
-                   }
-            }else
+                if( getState() )
+                    setState( false );
+                else
+                    setState( true );
+            }
+            else
             {
-                Toast.makeText(getAppContext(), "Error: The system has no flash light", Toast.LENGTH_SHORT).show();
+                Camera c = Camera.open();
+
+                if( getState() )
+                {
+                    Camera.Parameters p = c.getParameters();
+                    p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                    c.setParameters( p );
+                    c.startPreview();
+
+                    setState( true );
+                }
+                else
+                {
+                    c.stopPreview();
+                    c.release();
+
+                    setState( false );
+                }
+
             }
         }catch( Exception e )
         {
             Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
         }
     }
+
+   // @Override
+    public Context getAppContext(){return this.context;}
+
+   // @Override
+    public void giveResponse()
+    {
+
+    }
 }
+

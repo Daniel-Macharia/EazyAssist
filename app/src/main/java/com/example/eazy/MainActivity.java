@@ -92,10 +92,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestPermissions()
     {
-        requestSendSMSPermission();
+        /*requestSendSMSPermission();
         requestCallPermission();
         requestReadContactPermission();
         requestRecordAudioPermission();
+        requestWriteContactsPermission();*/
+
+        //if( ActivityCompat.checkSelfPermission( this, Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{
+                            Manifest.permission.READ_CONTACTS,
+                            Manifest.permission.WRITE_CONTACTS,
+                            Manifest.permission.CALL_PHONE,
+                            Manifest.permission.SEND_SMS,
+                            Manifest.permission.RECORD_AUDIO
+                    },
+                    1);
+        }
+
     }
 
     private void requestRecordAudioPermission()
@@ -150,6 +166,14 @@ public class MainActivity extends AppCompatActivity {
         if( ActivityCompat.checkSelfPermission( this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED )
         {
             ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.READ_CONTACTS}, 1);
+        }
+    }
+
+    private void requestWriteContactsPermission()
+    {
+        if( ActivityCompat.checkSelfPermission( this, Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.WRITE_CONTACTS}, 1);
         }
     }
 }
