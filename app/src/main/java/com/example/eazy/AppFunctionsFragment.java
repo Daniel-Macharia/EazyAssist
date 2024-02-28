@@ -3,6 +3,8 @@ package com.example.eazy;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -286,15 +288,28 @@ class SaveContact// implements Functionality
     {
         try
         {
-            ContentResolver cr = getAppContext().getContentResolver();
+            ArrayList<ContentProviderOperation> cp = new ArrayList<>();
+            int rawContactInsertIndex = cp.size();
 
-            ContentValues cv = new ContentValues();
-            Uri url = ContactsContract.Contacts.CONTENT_URI;
+            cp.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                    .build());
 
-            cv.put(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, getName() );
-            //cv.put( ContactsContract.CommonDataKinds.Phone.NUMBER, getNumber() );
+            cp.add( ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.RawContacts.Data.RAW_CONTACT_ID, rawContactInsertIndex)
+                    .withValue(ContactsContract.RawContacts.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, getName())
+                    .build());
 
-            cr.insert( url, cv );
+            cp.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                    .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID,rawContactInsertIndex)
+                    .withValue(ContactsContract.RawContacts.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, getNumber())
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                    .build());
+
+            ContentProviderResult[]res = getAppContext().getContentResolver().applyBatch(ContactsContract.AUTHORITY, cp);
 
         }catch (Exception e )
         {
@@ -371,7 +386,7 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
         try
         {
             this.context = context;
-            this.contact = new Contact(context, name, number);
+            contact = new Contact(context, name, number);
             this.message = message;
         }catch( Exception e )
         {
