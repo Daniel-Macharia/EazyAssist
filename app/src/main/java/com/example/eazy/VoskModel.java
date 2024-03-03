@@ -16,6 +16,7 @@ import org.vosk.android.SpeechStreamService;
 import org.vosk.android.StorageService;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 public class VoskModel implements RecognitionListener/*, Runnable */{
 
@@ -117,6 +118,47 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
                 (exception) -> setErrorState("Failed to unpack the model: " + exception.getMessage()));
     }
 
+    private Command parseToCommand( String result )
+    {
+        try
+        {
+            String text = null;
+
+            Scanner s = new Scanner( result );
+            for( int i = 0; i < 3; i++)
+                s.next();
+
+            text = s.nextLine();
+
+            s = new Scanner(text);
+
+            text = text.replace( text.charAt( text.length() - 1), ' ');
+            text = text.replace( text.charAt( 0 ), ' ');
+            text = text.replace( text.charAt( 1 ), ' ');
+
+            String []parts = text.split(" ");
+
+            String arg = "";
+
+            int i = 0;
+            while( i < parts.length)
+            {
+                arg += new String(parts[i]);
+                i++;
+            }
+
+
+            //Toast.makeText(getApplicationContext(), "Parts[0] = " + parts[0], Toast.LENGTH_SHORT).show();
+
+            return new Command( "", arg );
+        }catch( Exception e )
+        {
+            Toast.makeText(getApplicationContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
+
+        return new Command( "", "");
+    }
+
     @Override
     protected void finalize() {
         if (speechService != null) {
@@ -136,7 +178,7 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
             @Override
             public void run() {
                 Toast.makeText(getApplicationContext(), "Enqueueing command", Toast.LENGTH_SHORT).show();
-                CommandQueue.enqueue( getApplicationContext(), new Command(hypothesis, "no arg :)"));
+                CommandQueue.enqueue( getApplicationContext(), parseToCommand(hypothesis));
                 RecognizeVoice.resultView.append(hypothesis + "\n");
             }
         });

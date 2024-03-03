@@ -7,8 +7,8 @@ public class Command {
 
     public Command( String command, String arg)
     {
-        this.command = command;
-        this.arg = arg;
+        this.command = new String(command);
+        this.arg = new String(arg);
     }
 
     public String getCommand(){return this.command;}

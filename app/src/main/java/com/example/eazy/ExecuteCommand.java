@@ -63,7 +63,7 @@ public class ExecuteCommand implements Runnable {
         {
             while( !CommandQueue.isEmpty() )
             {
-                postToUI(CommandQueue.dequeue().getCommand());
+                postToUI(CommandQueue.dequeue().getArg());
             }
 
         }catch( Exception e )
