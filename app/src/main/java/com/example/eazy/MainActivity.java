@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
 
     public static VoskModel vm;
+    public static ExecuteCommand ec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +40,13 @@ public class MainActivity extends AppCompatActivity {
         tabs = findViewById( R.id.tabs );
         pager = findViewById( R.id.pager );
 
-        vm = new VoskModel( getApplicationContext(), new Handler( Looper.getMainLooper()));
+        try {
+            vm = new VoskModel( getApplicationContext(), new Handler( Looper.getMainLooper()));
+            ec = new ExecuteCommand( getApplicationContext() );
+        }catch( Exception e )
+        {
+            Toast.makeText(this, "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
 
         requestPermissions();
 
@@ -127,15 +134,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == PERMISSIONS_REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Recognizer initialization is a time-consuming and it involves IO,
                 // so we execute it in async task
-                vm.initModel();
+                try {
+                    vm.initModel();
+                }catch ( Exception e )
+                {
+                    Toast.makeText(getApplicationContext(), "Error Starting Listening thread: " + e, Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(getApplicationContext(), "Permission denied", Toast.LENGTH_SHORT).show();
                 //finish();

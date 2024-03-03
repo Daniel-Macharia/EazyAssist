@@ -17,7 +17,7 @@ import org.vosk.android.StorageService;
 
 import java.io.IOException;
 
-public class VoskModel implements RecognitionListener {
+public class VoskModel implements RecognitionListener/*, Runnable */{
 
     static private final int STATE_START = 0;
     static private final int STATE_READY = 1;
@@ -29,9 +29,13 @@ public class VoskModel implements RecognitionListener {
     private SpeechService speechService;
     private SpeechStreamService speechStreamService;
 
+    private boolean isReady, isListening;
+
     private Context context;
     //private TextView resultView;
     private Handler handler;
+
+   // private Thread thread;
 
     public VoskModel( Context context, Handler handler/*, TextView resultView*/)
     {
@@ -39,7 +43,56 @@ public class VoskModel implements RecognitionListener {
         //this.resultView = resultView;
         //resultView = new TextView(context);
         this.handler = handler;
+        isReady = false;
+        isListening = false;
     }
+
+    public void startListening()
+    {
+        try
+        {
+            if( isReady )//if model is ready
+            {
+                if( ! isListening )
+                {
+                    isListening = true;
+                    recognizeMicrophone();
+                }
+            }
+            /*if( thread != null )
+            {
+                thread = null;
+            }
+
+            thread = new Thread( this );
+            thread.start(); */
+        }catch( Exception e )
+        {
+            Toast.makeText(getApplicationContext(), "Error: " + e , Toast.LENGTH_SHORT).show();
+        }
+    }
+/*
+    @Override
+    public void run()
+    {
+        try
+        {
+            if( !isReady )
+            {
+                initModel();
+            }
+            else //if model is ready
+            {
+                recognizeMicrophone();
+            }
+
+            Toast.makeText(getApplicationContext(), "Exiting run method in vosk model", Toast.LENGTH_SHORT).show();
+
+        }catch( Exception e )
+        {
+            Toast.makeText(getApplicationContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
+    } */
 
     private Context getApplicationContext()
     {
@@ -56,6 +109,9 @@ public class VoskModel implements RecognitionListener {
                         Toast.makeText(getApplicationContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
                     }*/
                     setUiState(STATE_READY);
+
+                    isReady = true;
+
                     Toast.makeText(getApplicationContext(), "Unpacked Model Successfully", Toast.LENGTH_SHORT).show();
                 },
                 (exception) -> setErrorState("Failed to unpack the model: " + exception.getMessage()));
@@ -79,6 +135,8 @@ public class VoskModel implements RecognitionListener {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                Toast.makeText(getApplicationContext(), "Enqueueing command", Toast.LENGTH_SHORT).show();
+                CommandQueue.enqueue( getApplicationContext(), new Command(hypothesis, "no arg :)"));
                 RecognizeVoice.resultView.append(hypothesis + "\n");
             }
         });
@@ -87,9 +145,12 @@ public class VoskModel implements RecognitionListener {
     @Override
     public void onFinalResult(String hypothesis) {
         //resultView.append(hypothesis + "\n");
+
         handler.post(new Runnable() {
             @Override
             public void run() {
+                //Toast.makeText(getApplicationContext(), "Enqueueing command", Toast.LENGTH_SHORT).show();
+                //CommandQueue.enqueue( new Command(hypothesis, "no arg :)"));
                 RecognizeVoice.resultView.append(hypothesis + "\n");
             }
         });
@@ -199,17 +260,20 @@ public class VoskModel implements RecognitionListener {
         } */
     }
 
-    public void recognizeMicrophone() {
+    private void recognizeMicrophone() {
         if (speechService != null) {
             setUiState(STATE_DONE);
             speechService.stop();
             speechService = null;
+            isListening = false;
+            Toast.makeText(getApplicationContext(), "Stopped Listening", Toast.LENGTH_SHORT).show();
         } else {
             setUiState(STATE_MIC);
             try {
                 Recognizer rec = new Recognizer(model, 16000.0f);
                 speechService = new SpeechService(rec, 16000.0f);
                 speechService.startListening(this);
+                Toast.makeText(getApplicationContext(), "Started listening", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 setErrorState(e.getMessage());
             }

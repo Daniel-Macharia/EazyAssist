@@ -54,7 +54,7 @@ public class RecognizeVoice extends Fragment {
         try
         {
             //vm = new VoskModel( getApplicationContext(), new Handler( Looper.getMainLooper()), resultView);
-            MainActivity.vm.initModel();
+            //MainActivity.vm.initModel();
         }catch( Exception e)
         {
             Toast.makeText(context, "Error: " + e, Toast.LENGTH_SHORT).show();
@@ -75,7 +75,7 @@ public class RecognizeVoice extends Fragment {
             rec.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MainActivity.vm.recognizeMicrophone();
+                    MainActivity.vm.startListening();
                 }
             });
         }catch( Exception e )
