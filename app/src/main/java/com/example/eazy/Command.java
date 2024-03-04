@@ -2,15 +2,25 @@ package com.example.eazy;
 
 public class Command {
 
-    private String command;
-    private String arg;
+    private String []statement;
 
-    public Command( String command, String arg)
+    public Command( String []statement)
     {
-        this.command = new String(command);
-        this.arg = new String(arg);
+        this.statement = statement.clone();
     }
 
-    public String getCommand(){return this.command;}
-    public String getArg(){return this.arg;}
+    public String getCommand(){return statement[0];}
+
+    public String[] getStatement(){return statement;}
+    public String getArg()
+    {
+        String arg = "";
+
+        for( int i = 1; i < statement.length; i++ )
+        {
+            arg += statement[i] + " ";
+        }
+
+        return arg;
+    }
 }

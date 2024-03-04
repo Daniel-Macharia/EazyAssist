@@ -125,38 +125,34 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
             String text = null;
 
             Scanner s = new Scanner( result );
+
+            s.useDelimiter("\"");
+
             for( int i = 0; i < 3; i++)
                 s.next();
 
-            text = s.nextLine();
+            text = s.next();
 
             s = new Scanner(text);
 
-            text = text.replace( text.charAt( text.length() - 1), ' ');
-            text = text.replace( text.charAt( 0 ), ' ');
-            text = text.replace( text.charAt( 1 ), ' ');
+            //text = text.replace( text.charAt( text.length() - 1), ' ');
+           // text = text.replace( text.charAt( 0 ), ' ');
+            //text = text.replace( text.charAt( 1 ), ' ');
 
-            String []parts = text.split(" ");
+            String []parts = text.split(" ");//convert the said text into an array of Strings
 
-            String arg = "";
+            String arg = "", command = "";
 
-            int i = 0;
-            while( i < parts.length)
+            if( parts.length > 0 )
             {
-                arg += new String(parts[i]);
-                i++;
+                return new Command(parts);
             }
-
-
-            //Toast.makeText(getApplicationContext(), "Parts[0] = " + parts[0], Toast.LENGTH_SHORT).show();
-
-            return new Command( "", arg );
         }catch( Exception e )
         {
             Toast.makeText(getApplicationContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
         }
 
-        return new Command( "", "");
+        return new Command( new String[]{"",""} );
     }
 
     @Override
@@ -177,7 +173,7 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
         handler.post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(getApplicationContext(), "Enqueueing command", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Enqueueing command", Toast.LENGTH_SHORT).show();
                 CommandQueue.enqueue( getApplicationContext(), parseToCommand(hypothesis));
                 RecognizeVoice.resultView.append(hypothesis + "\n");
             }

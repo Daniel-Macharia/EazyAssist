@@ -18,6 +18,8 @@ import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.telephony.SmsManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +43,7 @@ public class AppFunctionsFragment extends Fragment {
     private SwitchFlashLight sf;
     private SaveContact sc;
     private CallPhone cp;
+    private Handler handler;
 
     public AppFunctionsFragment(Context context){
         this.context = context;
@@ -50,7 +53,10 @@ public class AppFunctionsFragment extends Fragment {
     public void onCreate( Bundle savedInstanceState )
     {
         super.onCreate( savedInstanceState );
-        sf = new SwitchFlashLight(getAppContext());
+
+        handler = new Handler(Looper.getMainLooper());
+
+        sf = new SwitchFlashLight( handler, getAppContext());
 
         BroadcastReceiver smsReceiver = new SentReceivedBroadcastReceiver( getAppContext() );
 
@@ -79,7 +85,7 @@ public class AppFunctionsFragment extends Fragment {
                 public void onClick(View v) {
                     String num = callNumber.getText().toString();
 
-                    cp = new CallPhone( getAppContext(), "", num);
+                    cp = new CallPhone( handler, getAppContext(), "", num);
                     cp.callPhone();
                 }
             });
@@ -90,7 +96,7 @@ public class AppFunctionsFragment extends Fragment {
                     String num = number.getText().toString();
                     String mes = message.getText().toString();
 
-                    SendSMSMessage sm = new SendSMSMessage( getAppContext(), "", num, mes);
+                    SendSMSMessage sm = new SendSMSMessage( handler, getAppContext(), "", num, mes);
                     sm.sendSMSMessage();
                 }
             });
@@ -109,7 +115,7 @@ public class AppFunctionsFragment extends Fragment {
                     String contactNumber = num.getText().toString();
                     String contactName = name.getText().toString();
 
-                    sc = new SaveContact( getContext(), contactName, contactNumber);
+                    sc = new SaveContact( handler, getContext(), contactName, contactNumber);
                     sc.saveContact();
                 }
             });
@@ -141,8 +147,10 @@ class Contact
     private String name;
     private String number;
     private Context context;
-    public Contact(Context context, String name, String number)
+    private Handler handler;
+    public Contact(Handler handler, Context context, String name, String number)
     {
+        this.handler = handler;
         this.context = context;
         this.name = name;
         this.number = number;
@@ -167,7 +175,7 @@ class Contact
 
     public String getNumber()
     {
-        if( this.number == null )//when number is null
+        if( this.number == null || number.equals("") )//when number is null
         {
             searchNumber( getName() );
             return null;
@@ -186,6 +194,16 @@ class Contact
         }
 
         return this.number;
+    }
+
+    private void postToUI(String message)
+    {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public String searchNumber( String name )
@@ -248,11 +266,14 @@ class Contact
 
             cursor.close();
 
-            Toast.makeText(getAppContext(), "Found:\n" + data, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getAppContext(), "Found:\n" + data, Toast.LENGTH_LONG).show();
+
+           postToUI("Found:\n" + data);
 
         }catch(Exception e )
         {
-            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            postToUI("Error: " + e);
         }
 
         return name;
@@ -264,11 +285,24 @@ class SaveContact// implements Functionality
     private Context context;
 
     private String name, number;
-    public SaveContact( Context context, String name, String number )
+
+    private Handler handler;
+    public SaveContact( Handler handler, Context context, String name, String number )
     {
+        this.handler = handler;
         this.context = context;
         this.name = name;
         this.number = number;
+    }
+
+    private void postToUI(String message)
+    {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setName( String name )
@@ -313,10 +347,12 @@ class SaveContact// implements Functionality
 
         }catch (Exception e )
         {
-            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            postToUI("Error: " + e);
         }
 
-        Toast.makeText(getAppContext(), "Saving Contact " + getNumber() + " as " + getName(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getAppContext(), "Saving Contact " + getNumber() + " as " + getName(), Toast.LENGTH_SHORT).show();
+        postToUI("Saving Contact " + getNumber() + " as " + getName());
     }
 
    // @Override
@@ -333,10 +369,22 @@ class CallPhone //implements Functionality
 {
     private Contact contact;
     private Context context;
-    public CallPhone(Context context, String name, String number)
+    private Handler handler;
+    public CallPhone(Handler handler, Context context, String name, String number)
     {
-        contact = new Contact(context, name, number);
+        this.handler = handler;
+        contact = new Contact(handler, context, name, number);
         this.context = context;
+    }
+
+    private void postToUI(String message)
+    {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
    // @Override
@@ -358,14 +406,16 @@ class CallPhone //implements Functionality
 
             if(ActivityCompat.checkSelfPermission( getAppContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED )
             {
-                Toast.makeText(getAppContext(), "Call Permission denied!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getAppContext(), "Call Permission denied!", Toast.LENGTH_SHORT).show();
+                postToUI("Call Permission denied!");
                 return;
             }
 
             getAppContext().startActivity( callIntent );
         }catch(Exception e )
         {
-            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            postToUI("Error: " + e);
         }
     }
 
@@ -381,17 +431,24 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
     private Contact contact;
     private String message;
     private Context context;
+    private Handler handler;
 
-    public SendSMSMessage(Context context, String name, String number, String message) {
-        try
-        {
-            this.context = context;
-            contact = new Contact(context, name, number);
-            this.message = message;
-        }catch( Exception e )
-        {
-            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
-        }
+    public SendSMSMessage(Handler handler, Context context, String name, String number, String message)
+    {
+        this.handler = handler;
+        this.context = context;
+        contact = new Contact(handler, context, name, number);
+        this.message = message;
+    }
+
+    private void postToUI(String message)
+    {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public String getMessage() {
@@ -406,7 +463,8 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
             if (ActivityCompat.checkSelfPermission(getAppContext(), android.Manifest.permission.SEND_SMS)
                     != PackageManager.PERMISSION_GRANTED) {
                 //ActivityCompat.requestPermissions( getAppContext(), new String[]{Manifest.permission.SEND_SMS}, 0);
-                Toast.makeText(getAppContext(), "Send SMS Permission Denied!", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getAppContext(), "Send SMS Permission Denied!", Toast.LENGTH_SHORT).show();
+                postToUI("Send SMS Permission Denied!");
             }
 
             Intent sent = new Intent("SMS_SENT");
@@ -419,7 +477,8 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
             smsManager.sendTextMessage(contact.getNumber(), null, getMessage(), sentIntent, deliveredIntent);
 
         } catch (Exception e) {
-            Toast.makeText(getAppContext(), e.toString(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getAppContext(),"Error: " + e, Toast.LENGTH_SHORT).show();
+            postToUI("Error: " + e);
         }
     }
 
@@ -440,11 +499,26 @@ class SentReceivedBroadcastReceiver extends BroadcastReceiver
     private String sent;
     private String received;
     private Context context;
+    private Handler handler;
+
     public SentReceivedBroadcastReceiver(Context context)
     {
+        this.handler = new Handler( context.getMainLooper() );
         sent = "SMS_SENT";
         received = "SMS_RECEIVED";
         this.context = context;
+    }
+
+    private Context getAppContext(){return this.context;}
+
+    private void postToUI(String message)
+    {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private Context getContext(){return this.context;}
@@ -455,11 +529,13 @@ class SentReceivedBroadcastReceiver extends BroadcastReceiver
 
         if( action.equals( sent ) )
         {
-            Toast.makeText(getContext(), "Message Sent!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "Message Sent!", Toast.LENGTH_SHORT).show();
+            postToUI("Message Sent!");
         }
         else if( action.equals( received ) )
         {
-            Toast.makeText(getContext(), "Message Delivered!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "Message Delivered!", Toast.LENGTH_SHORT).show();
+            postToUI("Message Delivered!");
         }
     }
 
@@ -468,10 +544,23 @@ class SwitchFlashLight// implements Functionality
 {
     private Context context;
     private static boolean status;
-    public SwitchFlashLight(Context context)
+
+    private Handler handler;
+    public SwitchFlashLight(Handler handler, Context context)
     {
+        this.handler = handler;
         this.context = context;
         status = false;
+    }
+
+    private void postToUI(String message)
+    {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getAppContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setState( boolean state )
@@ -521,7 +610,8 @@ class SwitchFlashLight// implements Functionality
             }
         }catch( Exception e )
         {
-            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            postToUI("Error: " + e);
         }
     }
 
