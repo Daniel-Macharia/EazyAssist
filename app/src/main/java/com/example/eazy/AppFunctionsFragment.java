@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.Camera;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.net.Uri;
@@ -177,8 +178,8 @@ class Contact
     {
         if( this.number == null || number.equals("") )//when number is null
         {
-            searchNumber( getName() );
-            return null;
+            return searchNumber( getName() );
+            //return null;
         }
 
         try//when number is a string insted
@@ -189,8 +190,8 @@ class Contact
 
         }catch( NumberFormatException e )
         {
-            searchNumber( this.number );
-            return null;
+            return searchNumber( this.number );
+            //return null;
         }
 
         return this.number;
@@ -242,7 +243,7 @@ class Contact
                                 null);
 
                         String phone = "";
-                        while( c.moveToNext() )
+                        if( c.moveToNext() )
                         {
                             int index = c.getColumnIndex( ContactsContract.CommonDataKinds.Phone.NUMBER);
                             phone += c.getString( index );
@@ -268,7 +269,15 @@ class Contact
 
             //Toast.makeText(getAppContext(), "Found:\n" + data, Toast.LENGTH_LONG).show();
 
-           postToUI("Found:\n" + data);
+           if( contacts.size() == 1 )
+           {
+               postToUI("One Contact found!");
+               return contacts.get( 0 )[1];
+           }
+           else
+           {
+               return "Found " + contacts.size() + " contacts: \n" + data;
+           }
 
         }catch(Exception e )
         {
@@ -276,7 +285,7 @@ class Contact
             postToUI("Error: " + e);
         }
 
-        return name;
+        return null;
     }
 }
 
@@ -397,8 +406,15 @@ class CallPhone //implements Functionality
     {
         try
         {
-            if( contact.getNumber() == null )
+            String number = contact.getNumber();
+            if( number == null )
                 return;
+            else
+            if( number.contains("Found"))
+            {
+                ResponseQueue.enqueue(getAppContext(), number);
+                return;
+            }
 
             Intent callIntent = new Intent(Intent.ACTION_CALL);
             callIntent.setFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
@@ -543,14 +559,13 @@ class SentReceivedBroadcastReceiver extends BroadcastReceiver
 class SwitchFlashLight// implements Functionality
 {
     private Context context;
-    private static boolean status;
+    private static boolean status = false;
 
     private Handler handler;
     public SwitchFlashLight(Handler handler, Context context)
     {
         this.handler = handler;
         this.context = context;
-        status = false;
     }
 
     private void postToUI(String message)
@@ -579,16 +594,53 @@ class SwitchFlashLight// implements Functionality
                 CameraManager cm = (CameraManager) getAppContext().getSystemService( Context.CAMERA_SERVICE );
                 String cameraId = cm.getCameraIdList()[0];
 
-                cm.setTorchMode( cameraId, getState() );
+                cm.registerTorchCallback(new CameraManager.TorchCallback() {
+                    @Override
+                    public void onTorchModeUnavailable(@NonNull String cameraId) {
+                        super.onTorchModeUnavailable(cameraId);
+                    }
+
+                    @Override
+                    public void onTorchModeChanged(@NonNull String cameraId, boolean enabled) {
+                        super.onTorchModeChanged(cameraId, enabled);
+                        if( enabled )
+                            postToUI("Torch enabled");
+                        else
+                            postToUI("Torch disabled");
+                    }
+                }, handler);
 
                 if( getState() )
-                    setState( false );
+                {
+                    cm.setTorchMode( cameraId, false );
+                    setState(false);
+                }
                 else
-                    setState( true );
+                {
+                    cm.setTorchMode(cameraId, true);
+                    setState(true);
+                }
+
             }
             else
             {
                 Camera c = Camera.open();
+
+                if( c == null )
+                {
+                    postToUI("Camera.open() returns null!");
+                }
+
+                if( c.getParameters().getFlashMode().equals(Camera.Parameters.FLASH_MODE_ON) )
+                {
+                    postToUI("Flash is on");
+                    setState(false);
+                }
+                else
+                {
+                    postToUI("Flash is off");
+                    setState(true);
+                }
 
                 if( getState() )
                 {

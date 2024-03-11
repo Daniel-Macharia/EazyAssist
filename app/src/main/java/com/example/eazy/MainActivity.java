@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static VoskModel vm;
     public static ExecuteCommand ec;
+    public static EazySpeak es;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         try {
             vm = new VoskModel( getApplicationContext(), new Handler( Looper.getMainLooper()));
             ec = new ExecuteCommand( getApplicationContext() );
+            es = new EazySpeak(getApplicationContext());
+            //es.speak("Hello World!");
         }catch( Exception e )
         {
             Toast.makeText(this, "Error: " + e, Toast.LENGTH_SHORT).show();
@@ -50,8 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
         requestPermissions();
 
-        EazySpeak es = new EazySpeak(getApplicationContext());
-        //es.speak("Hello World!");
+        SendNotification sn = new SendNotification(getApplicationContext(), "No message");
+        sn.sentNotification();
 
 
         TabLayout.Tab tab1 = tabs.newTab();
@@ -114,7 +117,8 @@ public class MainActivity extends AppCompatActivity {
                             Manifest.permission.WRITE_CONTACTS,
                             Manifest.permission.CALL_PHONE,
                             Manifest.permission.SEND_SMS,
-                            Manifest.permission.RECORD_AUDIO
+                            Manifest.permission.RECORD_AUDIO,
+                            Manifest.permission.POST_NOTIFICATIONS
                     },
                     1);
         }
