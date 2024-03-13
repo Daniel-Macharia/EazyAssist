@@ -15,7 +15,7 @@ public class CommandQueue {
         try
         {
             commandQueue.add( command );
-            MainActivity.ec.startExecutingCommands();
+            HomeActivity.ec.startExecutingCommands();
         }catch ( Exception e )
         {
             Toast.makeText( context, "Error: " + e, Toast.LENGTH_SHORT).show();

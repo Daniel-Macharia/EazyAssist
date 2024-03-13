@@ -75,7 +75,7 @@ public class RecognizeVoice extends Fragment {
             rec.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    MainActivity.vm.startListening();
+                    HomeActivity.vm.startListening();
                 }
             });
         }catch( Exception e )

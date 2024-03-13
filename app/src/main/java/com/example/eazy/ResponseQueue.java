@@ -15,7 +15,7 @@ public class ResponseQueue {
         try
         {
             responseQueue.add( response );
-            MainActivity.es.startExecutingCommands();
+            HomeActivity.es.startExecutingCommands();
         }catch( Exception e )
         {
             Toast.makeText( context, "Error: " + e, Toast.LENGTH_SHORT).show();

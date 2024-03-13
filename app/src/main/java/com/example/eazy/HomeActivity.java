@@ -6,21 +6,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.telephony.SmsManager;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 
-public class MainActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity {
 
 
     private TabLayout tabs;
@@ -36,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home);
 
         tabs = findViewById( R.id.tabs );
         pager = findViewById( R.id.pager );
@@ -160,19 +154,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestSendSMSPermission()
     {
-        if( ActivityCompat.checkSelfPermission( MainActivity.this, android.Manifest.permission.SEND_SMS )
+        if( ActivityCompat.checkSelfPermission( HomeActivity.this, android.Manifest.permission.SEND_SMS )
                 != PackageManager.PERMISSION_GRANTED )
         {
-            ActivityCompat.requestPermissions( MainActivity.this, new String[]{Manifest.permission.SEND_SMS}, 0);
+            ActivityCompat.requestPermissions( HomeActivity.this, new String[]{Manifest.permission.SEND_SMS}, 0);
         }
     }
 
     private void requestCallPermission()
     {
-        if( ActivityCompat.checkSelfPermission( MainActivity.this, Manifest.permission.CALL_PHONE )
+        if( ActivityCompat.checkSelfPermission( HomeActivity.this, Manifest.permission.CALL_PHONE )
                 != PackageManager.PERMISSION_GRANTED )
         {
-            ActivityCompat.requestPermissions( MainActivity.this, new String[]{Manifest.permission.CALL_PHONE}, 0);
+            ActivityCompat.requestPermissions( HomeActivity.this, new String[]{Manifest.permission.CALL_PHONE}, 0);
         }
     }
 
