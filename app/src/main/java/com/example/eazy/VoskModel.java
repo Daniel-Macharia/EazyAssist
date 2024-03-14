@@ -117,29 +117,42 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
                 },
                 (exception) -> setErrorState("Failed to unpack the model: " + exception.getMessage()));
     }
-
-    private Command parseToCommand( String result )
+    private String parse( String rawInput )
     {
+        String output = "";
+
         try
         {
-            String text = null;
-
-            Scanner s = new Scanner( result );
+            Scanner s = new Scanner( rawInput );
 
             s.useDelimiter("\"");
 
             for( int i = 0; i < 3; i++)
                 s.next();
 
-            text = s.next();
+            output = s.next();
+        }catch( Exception e )
+        {
+            Toast.makeText(getApplicationContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
 
-            s = new Scanner(text);
+        return output;
+    }
+
+    private Command parseToCommand( String textCommand )
+    {
+        try
+        {
+            //String text = null;
+
 
             //text = text.replace( text.charAt( text.length() - 1), ' ');
            // text = text.replace( text.charAt( 0 ), ' ');
             //text = text.replace( text.charAt( 1 ), ' ');
 
-            String []parts = text.split(" ");//convert the said text into an array of Strings
+            Scanner s = new Scanner(textCommand);
+
+            String []parts = textCommand.split(" ");//convert the said text into an array of Strings
 
             String arg = "", command = "";
 
@@ -169,29 +182,27 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
 
     @Override
     public void onResult(String hypothesis) {
-        //resultView.append(hypothesis + "\n");
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                //Toast.makeText(getApplicationContext(), "Enqueueing command", Toast.LENGTH_SHORT).show();
-                CommandQueue.enqueue( getApplicationContext(), parseToCommand(hypothesis));
-                RecognizeVoice.resultView.append(hypothesis + "\n");
-            }
-        });
+
+        String textCommand = parse( hypothesis );
+        if( !textCommand.equals("") )
+        {
+            CommandQueue.enqueue( getApplicationContext(), parseToCommand(textCommand));
+            RecognizeVoice.list.add( textCommand );
+            RecognizeVoice.adapter.update();
+        }
     }
 
     @Override
     public void onFinalResult(String hypothesis) {
-        //resultView.append(hypothesis + "\n");
 
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                //Toast.makeText(getApplicationContext(), "Enqueueing command", Toast.LENGTH_SHORT).show();
-                //CommandQueue.enqueue( new Command(hypothesis, "no arg :)"));
-                RecognizeVoice.resultView.append(hypothesis + "\n");
-            }
-        });
+        String textCommand = parse( hypothesis );
+        if( !textCommand.equals("") )
+        {
+            CommandQueue.enqueue( getApplicationContext(), parseToCommand(textCommand));
+            RecognizeVoice.list.add( textCommand );
+            RecognizeVoice.adapter.update();
+        }
+
         setUiState(STATE_DONE);
         if (speechStreamService != null) {
             speechStreamService = null;
@@ -200,13 +211,13 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
 
     @Override
     public void onPartialResult(String hypothesis) {
-        //resultView.append(hypothesis + "\n");
-        /*handler.post(new Runnable() {
-            @Override
-            public void run() {
-                RecognizeVoice.resultView.append(hypothesis + "\n");
-            }
-        }); */
+        /*String textCommand = parse( hypothesis );
+        if( !textCommand.equals("") )
+        {
+            CommandQueue.enqueue( getApplicationContext(), parseToCommand(textCommand));
+            RecognizeVoice.list.add( textCommand );
+            RecognizeVoice.adapter.update();
+        }*/
     }
 
     @Override
@@ -263,13 +274,14 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
     }
 
     private void setErrorState(String message) {
-        //resultView.setText(message);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                RecognizeVoice.resultView.append(message + "\n");
-            }
-        });
+        String textCommand = parse( message );
+        if( !textCommand.equals("") )
+        {
+            CommandQueue.enqueue( getApplicationContext(), parseToCommand(textCommand));
+            RecognizeVoice.list.add( textCommand );
+            RecognizeVoice.adapter.update();
+        }
+
        // ((Button) view.findViewById(R.id.recognize_mic)).setText(R.string.recognize_microphone);
         //findViewById(R.id.recognize_file).setEnabled(false);
         //view.findViewById(R.id.recognize_mic).setEnabled(false);

@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cream"
+    android:background="@drawable/message_bot"
     >
 
     <LinearLayout
@@ -23,33 +23,16 @@
             />
     </LinearLayout>
 
-    <!-- ScrollView
+    <ListView
+        android:id="@+id/result_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="6"
-        >
-
-        <TextView
-            android:id="@+id/result"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="@color/blue"
-            android:inputType="textMultiLine"
-            android:textSize="24sp"
-            android:gravity="bottom"
-            />
-
-    </ScrollView -->
-
-    <TextView
-        android:id="@+id/result"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="6"
-        android:textColor="@color/blue"
-        android:inputType="textMultiLine"
-        android:textSize="24sp"
         android:gravity="bottom"
+        android:stackFromBottom="true"
+        android:cacheColorHint="#00000000"
+        android:divider="@null"
+        android:transcriptMode="alwaysScroll"
         />
 
 </LinearLayout>

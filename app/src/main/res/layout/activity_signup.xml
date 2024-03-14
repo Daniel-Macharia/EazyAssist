@@ -3,14 +3,172 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
+    android:background="@drawable/message_bot"
     >
 
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="320dp"
         android:layout_height="wrap_content"
-        android:text="Welcome to sign up activity!"
-        android:textSize="24sp"
-        android:textColor="@color/red"
-        />
+        android:gravity="center"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sign UP"
+            android:textSize="24sp"
+            android:textColor="@color/orange"
+            />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="username: "
+                android:textColor="@color/orange"
+                android:gravity="end|center"
+                android:paddingEnd="4dp"
+                android:textSize="18sp"
+                />
+
+            <EditText
+                android:id="@+id/username"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="@color/green"
+                android:hint="Enter username"
+                android:textColorHint="@color/white"
+                android:gravity="start|center"
+                android:paddingStart="4dp"
+                android:inputType="text"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="email: "
+                android:textColor="@color/orange"
+                android:gravity="end|center"
+                android:paddingEnd="4dp"
+                android:textSize="18sp"
+                />
+
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="@color/green"
+                android:hint="Enter email address"
+                android:textColorHint="@color/white"
+                android:gravity="start|center"
+                android:paddingStart="4dp"
+                android:inputType="text"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="password: "
+                android:textColor="@color/orange"
+                android:gravity="end|center"
+                android:paddingEnd="4dp"
+                android:textSize="18sp"
+                />
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="@color/green"
+                android:textSize="16sp"
+                android:hint="Enter password"
+                android:textColorHint="@color/white"
+                android:gravity="start|center"
+                android:paddingStart="4dp"
+                android:inputType="text"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="confirm: "
+                android:textColor="@color/orange"
+                android:textSize="24sp"
+                android:gravity="end|center"
+                android:paddingEnd="4dp"
+                />
+
+            <EditText
+                android:id="@+id/confirm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:textColor="@color/green"
+                android:textSize="16sp"
+                android:hint="Enter confirm password"
+                android:textColorHint="@color/white"
+                android:gravity="start|center"
+                android:paddingStart="4dp"
+                android:inputType="text"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:gravity="end|center"
+            android:paddingEnd="8dp"
+            >
+
+            <Button
+                android:id="@+id/signup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/green"
+                android:text="sign up"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
 </LinearLayout>

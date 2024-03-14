@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -30,13 +31,17 @@ import org.vosk.android.StorageService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class RecognizeVoice extends Fragment {
 
     private View view;
-    public static TextView resultView;
+    public static ListView progressList;
 
     private Context context;
+    public static ArrayList<String> list = new ArrayList<>(10);
+
+    public static ProgressListViewAdapter adapter;
 
     public RecognizeVoice(Context context){
         try {
@@ -66,12 +71,14 @@ public class RecognizeVoice extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate( R.layout.recognize, container, false);
 
-        resultView = view.findViewById( R.id.result);
+        progressList = view.findViewById( R.id.result_list);
         Button rec = view.findViewById( R.id.recognize_mic );
 
         //vm = new VoskModel( getApplicationContext(), new Handler( Looper.getMainLooper()), resultView);
 
         try {
+            adapter = new ProgressListViewAdapter( getContext(), list);
+            progressList.setAdapter( adapter );
             rec.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

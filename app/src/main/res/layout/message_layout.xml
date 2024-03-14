@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="start"
+    android:padding="8dp"
+    android:id="@+id/messageLayout"
+    >
+
+    <TextView
+        android:id="@+id/message"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="This is a message"
+        android:textColor="@color/blue"
+        android:background="@drawable/rounded_rect"
+        android:backgroundTint="@color/cream"
+        android:padding="4dp"
+        />
+
+</LinearLayout>
