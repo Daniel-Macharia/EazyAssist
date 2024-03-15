@@ -1,0 +1,7 @@
+Hello world!
+This is help.
+
+2 files found with path 'META-INF/NOTICE.md'.
+Adding a packagingOptions block may help, please refer to
+https://developer.android.com/reference/tools/gradle-api/8.1/com/android/build/api/dsl/ResourcesPackagingOptions
+for more information

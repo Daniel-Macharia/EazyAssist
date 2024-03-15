@@ -6,10 +6,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
@@ -19,6 +25,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private TabLayout tabs;
     private ViewPager pager;
+    private ImageView menu_popup;
 
     /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
@@ -34,6 +41,15 @@ public class HomeActivity extends AppCompatActivity {
 
         tabs = findViewById( R.id.tabs );
         pager = findViewById( R.id.pager );
+
+        menu_popup = findViewById( R.id.menu_popup );
+
+        menu_popup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showPopUpMenu(view);
+            }
+        });
 
         try {
             vm = new VoskModel( getApplicationContext(), new Handler( Looper.getMainLooper()));
@@ -92,6 +108,40 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void showPopUpMenu(View view)
+    {
+        PopupMenu popup = new PopupMenu( getApplicationContext(), view);
+
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+
+                int id = item.getItemId();
+
+                if( id == R.id.help )
+                {
+                    Toast.makeText(getApplicationContext(), "Help Clicked!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent( HomeActivity.this, HelpActivity.class );
+                    startActivity(intent);
+                    return true;
+                }
+                else if( id == R.id.contact_devs )
+                {
+                    Toast.makeText(getApplicationContext(), "Contact Developers!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent( HomeActivity.this, ContactDevelopersActivity.class );
+                    startActivity(intent);
+                    return true;
+                }
+
+
+                return false;
+            }
+        });
+
+        popup.inflate( R.menu.main_menu);
+        popup.show();
     }
 
     private void requestPermissions()

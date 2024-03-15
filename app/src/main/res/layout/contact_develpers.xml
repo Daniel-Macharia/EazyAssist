@@ -10,10 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:gravity="center"
-        android:text="Change Password"
-        android:textColor="@color/orange"
+        android:text="Email the developers"
         android:textSize="24sp"
+        android:textColor="@color/orange"
+        android:gravity="center"
         />
 
     <LinearLayout
@@ -27,72 +27,75 @@
             android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="@drawable/rounded_rect"
-            android:backgroundTint="@color/holo_blue_dark"
+            android:gravity="center"
             >
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="48dp"
                 android:orientation="horizontal"
+                android:gravity="center|top"
+                android:background="@drawable/rounded_rect"
+                android:backgroundTint="@color/holo_blue_dark"
+                android:layout_marginBottom="4dp"
                 >
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="New password: "
                     android:textColor="@color/black"
-                    android:gravity="end|center"
-                    android:paddingEnd="4dp"
-                    android:textSize="18sp"
+                    android:text="Subject"
+                    android:gravity="center|end"
+                    android:textSize="16sp"
                     />
 
                 <EditText
-                    android:id="@+id/newPassword"
+                    android:id="@+id/email_subject"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
-                    android:textColor="@color/green"
-                    android:textSize="16sp"
-                    android:hint="Enter password"
-                    android:textColorHint="@color/grey"
-                    android:gravity="start|center"
-                    android:paddingStart="4dp"
                     android:inputType="text"
+                    android:textColor="@color/blue"
+                    android:textColorHint="@color/grey"
+                    android:hint="Enter email subject"
+                    android:gravity="top|start"
+                    android:textSize="16sp"
                     />
 
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="112dp"
                 android:orientation="horizontal"
+                android:gravity="center|top"
+                android:paddingTop="8dp"
+                android:background="@drawable/rounded_rect"
+                android:backgroundTint="@color/holo_blue_dark"
+                android:layout_marginTop="4dp"
                 >
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="confirm: "
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:gravity="end|center"
-                    android:paddingEnd="4dp"
+                    android:text="Subject"
+                    android:gravity="center|end"
+                    android:textSize="16sp"
                     />
 
                 <EditText
-                    android:id="@+id/confirmNewPassword"
+                    android:id="@+id/email_body"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
-                    android:textColor="@color/green"
-                    android:textSize="16sp"
-                    android:hint="Enter confirm password"
+                    android:inputType="textMultiLine"
+                    android:textColor="@color/blue"
                     android:textColorHint="@color/grey"
-                    android:gravity="start|center"
-                    android:paddingStart="4dp"
-                    android:inputType="text"
+                    android:hint="Enter email subject"
+                    android:gravity="top|start"
+                    android:padding="8dp"
+                    android:textSize="16sp"
                     />
 
             </LinearLayout>
@@ -100,17 +103,17 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="72dp"
-                android:gravity="end|center"
+                android:orientation="horizontal"
+                android:gravity="center|end"
                 android:paddingEnd="8dp"
                 >
-
                 <Button
-                    android:id="@+id/changePassword"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/send_email"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@color/green"
-                    android:text="apply change"
-                    android:textColor="@color/purple"
+                    android:layout_width="wrap_content"
+                    android:text="send"
+                    android:textColor="@color/blue"
+                    android:gravity="center"
                     android:textSize="16sp"
                     />
 
@@ -119,6 +122,5 @@
         </LinearLayout>
 
     </LinearLayout>
-
 
 </LinearLayout>

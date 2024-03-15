@@ -12,11 +12,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center"
+        android:background="@drawable/rounded_rect"
+        android:backgroundTint="@android:color/holo_blue_dark"
         >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/orange"
+            android:textColor="@color/black"
             android:text="Login"
             android:textSize="24sp"
             />
@@ -33,7 +35,7 @@
                 android:layout_weight="1"
                 android:text="Username: "
                 android:textSize="18dp"
-                android:textColor="@color/orange"
+                android:textColor="@color/black"
                 />
 
             <EditText
@@ -61,7 +63,7 @@
                 android:layout_weight="1"
                 android:text="Password: "
                 android:textSize="18dp"
-                android:textColor="@color/orange"
+                android:textColor="@color/black"
                 />
 
             <EditText
@@ -69,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:hint="Enter password"
-                android:textColorHint="@color/white"
+                android:textColorHint="@color/grey"
                 android:textColor="@color/blue"
                 android:inputType="text"
                 />
@@ -117,7 +119,7 @@
                     android:layout_height="wrap_content"
                     android:text="login"
                     android:textSize="16dp"
-                    android:textColor="@color/orange"
+                    android:textColor="@color/purple"
                     android:backgroundTint="@color/green"
                     />
 
@@ -138,7 +140,7 @@
                 android:layout_height="wrap_content"
                 android:text="forgot password?"
                 android:textSize="24dp"
-                android:textColor="@color/orange"
+                android:textColor="@color/purple"
                 android:background="@android:color/transparent"
                 />
 
