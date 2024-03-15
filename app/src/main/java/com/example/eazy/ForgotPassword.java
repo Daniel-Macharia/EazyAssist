@@ -93,8 +93,9 @@ public class ForgotPassword extends AppCompatActivity {
 
         //send otp to this email;
         oneTimePassword = generateOTP();
-        //Toast.makeText(getApplicationContext(), "Email = " + email, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "OTP = " + oneTimePassword, Toast.LENGTH_SHORT).show();
         SendMessageTask task = new SendMessageTask(getApplicationContext(), email, "" + oneTimePassword);
+        task.start();
         //upon success
         Toast.makeText(getApplicationContext(), "An OTP code has been sent to your email", Toast.LENGTH_SHORT).show();
 
