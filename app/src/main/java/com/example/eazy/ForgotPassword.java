@@ -3,6 +3,8 @@ package com.example.eazy;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,17 +38,14 @@ public class ForgotPassword extends AppCompatActivity {
         resend_otp = findViewById( R.id.resend_otp );
         confirm_otp = findViewById( R.id.confirm_otp );
 
-        sendOTP();
-
-        Toast.makeText(getApplicationContext(), "Generated OTP = " + oneTimePassword, Toast.LENGTH_SHORT).show();
+        Handler handler = new Handler( Looper.getMainLooper() );
+        sendOTP( handler );
 
         confirm_otp.setOnClickListener( new View.OnClickListener(){
             @Override
             public void onClick( View view )
             {
                 int otp = Integer.parseInt(entered_otp.getText().toString());
-
-                Toast.makeText(getApplicationContext(), "Entered OTP = " + otp, Toast.LENGTH_SHORT).show();
 
                 if( otp == oneTimePassword )
                 {
@@ -65,9 +64,7 @@ public class ForgotPassword extends AppCompatActivity {
         resend_otp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 sendOTP();
-
-                Toast.makeText(getApplicationContext(), "New OTP = " + oneTimePassword, Toast.LENGTH_SHORT).show();
+                 sendOTP( handler );
             }
         });
 
@@ -84,21 +81,24 @@ public class ForgotPassword extends AppCompatActivity {
         return i;
     }
 
-    private void sendOTP()
+    private void sendOTP(Handler handler)
     {
-        User user = new User( getApplicationContext() );
-        user.open();
-        String email = user.getEmail();
-        user.close();
+        try {
+            User user = new User( getApplicationContext() );
+            user.open();
+            String email = user.getEmail();
+            user.close();
 
-        //send otp to this email;
-        oneTimePassword = generateOTP();
-        Toast.makeText(getApplicationContext(), "OTP = " + oneTimePassword, Toast.LENGTH_SHORT).show();
-        SendMessageTask task = new SendMessageTask(getApplicationContext(), email, "" + oneTimePassword);
-        task.start();
-        //upon success
-        Toast.makeText(getApplicationContext(), "An OTP code has been sent to your email", Toast.LENGTH_SHORT).show();
-
+            oneTimePassword = generateOTP();
+            //send otp to this email;
+            SendMessageTask task = new SendMessageTask( handler,ForgotPassword.this, email, "" + oneTimePassword);
+            task.start();
+            //upon success
+            Toast.makeText(getApplicationContext(), "An OTP code has been sent to your email", Toast.LENGTH_SHORT).show();
+        }catch(Exception e)
+        {
+            Toast.makeText(getApplicationContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
     }
 }
 
@@ -108,16 +108,31 @@ class SendMessageTask implements Runnable
     private String userEmail;
     private Thread thread;
     private Context context;
+    private Handler handler;
 
-    public SendMessageTask(Context context, String userEmail, String code)
+    public SendMessageTask(Handler handler, Context context, String userEmail, String code)
     {
+        //Looper.prepare();
+        this.handler = handler;
         this.context = context;
         this.userEmail = new String( userEmail );
         this.code = new String( code );
         thread = null;
     }
 
+    private void toast(String message)
+    {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText( getAppContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private Context getAppContext(){return this.context; }
+
+    private Handler getHandler(){return this.handler;}
     public void start()
     {
         try
@@ -135,7 +150,7 @@ class SendMessageTask implements Runnable
             }
         }catch( Exception e )
         {
-            Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+            toast("Error: " + e );
         }
     }
     @Override
@@ -145,19 +160,19 @@ class SendMessageTask implements Runnable
 
             if( userEmail.equals("") )
             {
-                Toast.makeText( getAppContext(), "No registered Email!", Toast.LENGTH_SHORT).show();
+                toast("No registered Email!");
                 return;
             }
-            if( !UtilityClass.networkIsAvailable( getAppContext() ) )
+            if( !UtilityClass.networkIsAvailable( getHandler(), getAppContext() ) )
             {
-                Toast.makeText( getAppContext(), "Check network connection!", Toast.LENGTH_LONG).show();
+                toast("Check network connection!");
             }
 
             String senderEmail = "sanaautoto@gmail.com";
             String senderEmailPassword = "vues ziws onvl qldq";
             String host = "smtp.gmail.com";
 
-            //Toast.makeText(this, "Setting up properties", Toast.LENGTH_SHORT).show();
+            //toast("Setting up properties");
 
             Properties properties = System.getProperties();
             properties.put("mail.smtp.host", host);
@@ -166,7 +181,7 @@ class SendMessageTask implements Runnable
             properties.put("mail.smtp.ssl.enable", true);
             properties.put("mail.smtp.auth", true);
 
-            //Toast.makeText(this, "After Setting up Properties", Toast.LENGTH_SHORT).show();
+            //toast("After Setting up Properties");
 
             Session session = Session.getInstance( properties, new Authenticator(){
                 @Override
@@ -175,7 +190,7 @@ class SendMessageTask implements Runnable
                 }
             });
 
-            // Toast.makeText(this, "After Creating Session", Toast.LENGTH_SHORT).show();
+            // toast("After Creating Session");
 
             MimeMessage mimeMessage = new MimeMessage(session);
             mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(userEmail) );
@@ -187,11 +202,11 @@ class SendMessageTask implements Runnable
         }
         catch( MessagingException me)
         {
-            Toast.makeText( getAppContext(), "Messaging Exception: " + me, Toast.LENGTH_SHORT).show();
+            toast("Messaging Exception: " + me);
         }
         catch( Exception e )
         {
-            Toast.makeText(getAppContext(), "Error: " + e.toString(), Toast.LENGTH_SHORT).show();
+            toast("Error: " + e);
         }
 
     }

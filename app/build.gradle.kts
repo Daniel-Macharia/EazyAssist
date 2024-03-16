@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.eazy"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.eazy"
@@ -25,6 +25,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+    packagingOptions{
+        exclude("META-INF/NOTICE.md")
+        exclude("META-INF/LICENSE.md")
     }
 }
 

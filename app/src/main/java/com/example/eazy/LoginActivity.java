@@ -4,13 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private Button forgot, login;//, signup;
+    private Button forgot, login;
+    private EditText username, password;
     @Override
     protected void onCreate( Bundle savedInstanceState )
     {
@@ -32,8 +34,10 @@ public class LoginActivity extends AppCompatActivity {
 
 
         login = findViewById( R.id.login );
-        //signup = findViewById( R.id.signUp );
         forgot = findViewById( R.id.forgotPassword );
+
+        username = findViewById( R.id.username );
+        password = findViewById( R.id.password );
 
 
         login.setOnClickListener( new View.OnClickListener()
@@ -41,29 +45,24 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view)
             {
-                String name = "";
-                String pass = "";
+                String name = "", pass = "";
+                name = username.getText().toString();
+                pass = password.getText().toString();
 
                 User user = new User(getApplicationContext());
                 user.open();
-                if( user.credentialsAreCorrect( name, pass) )
-                    Toast.makeText(getApplicationContext(), "User Exists!", Toast.LENGTH_SHORT).show();
-                else
-                    Toast.makeText(getApplicationContext(), "User does not exist!", Toast.LENGTH_SHORT).show();
+                boolean isCorrect = user.credentialsAreCorrect( name, pass);
                 user.close();
-                Intent intent = new Intent( LoginActivity.this, HomeActivity.class);
-                startActivity( intent );
-                finish();
+
+                if( isCorrect )
+                {
+                    Intent intent = new Intent( LoginActivity.this, HomeActivity.class);
+                    startActivity( intent );
+                    finish();
+                }
+
             }
         });
-
-        /*signup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent( LoginActivity.this, SignUpActivity.class);
-                startActivity( intent );
-            }
-        });*/
 
         forgot.setOnClickListener(new View.OnClickListener() {
             @Override

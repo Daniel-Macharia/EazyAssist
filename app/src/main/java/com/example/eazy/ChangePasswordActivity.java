@@ -33,8 +33,26 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
                 Toast.makeText( getApplicationContext(), "New pass = " + pass
                 + "\nCofirmed = " + conf, Toast.LENGTH_SHORT).show();
+
+                if( isValidPassword( pass ) && pass.equals( conf ) )
+                {
+                    User user = new User( getApplicationContext() );
+                    user.open();
+                    user.changePassword( pass );
+                    user.close();
+                }
             }
         });
 
+    }
+
+    private boolean isValidPassword( String password )
+    {
+        String regex = "";
+
+        //if( password.matches( regex ) )
+        //    return true;
+
+        return true;
     }
 }

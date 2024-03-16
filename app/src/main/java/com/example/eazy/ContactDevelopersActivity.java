@@ -9,6 +9,8 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +35,8 @@ public class ContactDevelopersActivity extends AppCompatActivity {
         emailBody = findViewById( R.id.email_body );
         sendEmail = findViewById( R.id.send_email );
 
+        Handler handler = new Handler( Looper.getMainLooper() );
+
         sendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,15 +44,15 @@ public class ContactDevelopersActivity extends AppCompatActivity {
                 subject = emailSubject.getText().toString();
                 body = emailBody.getText().toString();
 
-                sendEmailToDevs( subject, body);
+                sendEmailToDevs( handler, subject, body);
             }
         });
     }
 
-    private void sendEmailToDevs( String subject, String body)
+    private void sendEmailToDevs( Handler handler, String subject, String body)
     {
         try {
-            if( !UtilityClass.networkIsAvailable( getApplicationContext() ) )
+            if( !UtilityClass.networkIsAvailable( handler, getApplicationContext() ) )
             {
                 Toast.makeText(this, "Check network connection!", Toast.LENGTH_LONG).show();
             }

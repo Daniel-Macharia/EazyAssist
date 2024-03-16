@@ -6,11 +6,12 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Handler;
 import android.widget.Toast;
 
 public class UtilityClass {
 
-    public static boolean networkIsAvailable(Context context)
+    public static boolean networkIsAvailable(Handler handler, Context context)
     {
 
         try {
@@ -46,7 +47,12 @@ public class UtilityClass {
             }
         }catch( Exception e )
         {
-            Toast.makeText( context, "Error: Network Error\n" + e, Toast.LENGTH_SHORT).show();
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "Error: " + e, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
         return false;

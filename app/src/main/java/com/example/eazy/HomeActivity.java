@@ -162,7 +162,9 @@ public class HomeActivity extends AppCompatActivity {
                             Manifest.permission.CALL_PHONE,
                             Manifest.permission.SEND_SMS,
                             Manifest.permission.RECORD_AUDIO,
-                            Manifest.permission.POST_NOTIFICATIONS
+                            Manifest.permission.POST_NOTIFICATIONS,
+                            Manifest.permission.ACCESS_NETWORK_STATE,
+                            Manifest.permission.INTERNET
                     },
                     1);
         }

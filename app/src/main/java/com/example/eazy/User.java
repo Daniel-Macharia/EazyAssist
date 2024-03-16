@@ -131,8 +131,15 @@ public class User {
         {
             String []userData = getUserDetails();
 
-            if( username.equals( userData[0] ) && password.equals( userData[1] ) )
+            if( userData[0].equals( username ) && userData[1].equals( password ) )
+            {
+                //Toast.makeText(getContext(), "Correct username and password!", Toast.LENGTH_SHORT).show();
                 return true;
+            }
+            else
+            {
+                Toast.makeText(getContext(), "Incorrect username or password!", Toast.LENGTH_SHORT).show();
+            }
         }catch( Exception e )
         {
             Toast.makeText(getContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
@@ -146,6 +153,25 @@ public class User {
         String []userDetails = getUserDetails();
 
         return userDetails[2];
+    }
+
+    public boolean changePassword( String newPassword )
+    {
+        //return true on success and false on failure
+        try
+        {
+            ContentValues cv = new ContentValues();
+            cv.put( userPassword, newPassword );
+
+            int n = database.update( tableName, cv, null, null);
+
+            Toast.makeText(getContext(), n + " rows updated!", Toast.LENGTH_SHORT).show();
+        }catch( Exception e )
+        {
+            Toast.makeText(getContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
+        }
+
+        return false;//return false on failure
     }
 
 }
