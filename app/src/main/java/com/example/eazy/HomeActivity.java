@@ -152,7 +152,12 @@ public class HomeActivity extends AppCompatActivity {
         requestRecordAudioPermission();
         requestWriteContactsPermission();*/
 
-        //if( ActivityCompat.checkSelfPermission( this, Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED)
+        if( ActivityCompat.checkSelfPermission( this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
+        }
+
+        //request other permissions
         {
             ActivityCompat.requestPermissions(
                     this,
@@ -161,7 +166,6 @@ public class HomeActivity extends AppCompatActivity {
                             Manifest.permission.WRITE_CONTACTS,
                             Manifest.permission.CALL_PHONE,
                             Manifest.permission.SEND_SMS,
-                            Manifest.permission.RECORD_AUDIO,
                             Manifest.permission.POST_NOTIFICATIONS,
                             Manifest.permission.ACCESS_NETWORK_STATE,
                             Manifest.permission.INTERNET

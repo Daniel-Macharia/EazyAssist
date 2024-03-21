@@ -36,6 +36,7 @@ import androidx.fragment.app.Fragment;
 import android.provider.ContactsContract;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class AppFunctionsFragment extends Fragment {
 
@@ -86,7 +87,7 @@ public class AppFunctionsFragment extends Fragment {
                 public void onClick(View v) {
                     String num = callNumber.getText().toString();
 
-                    cp = new CallPhone( handler, getAppContext(), "", num);
+                    cp = new CallPhone( handler, getAppContext(), new String[]{""}, num);
                     cp.callPhone();
                 }
             });
@@ -97,7 +98,7 @@ public class AppFunctionsFragment extends Fragment {
                     String num = number.getText().toString();
                     String mes = message.getText().toString();
 
-                    SendSMSMessage sm = new SendSMSMessage( handler, getAppContext(), "", num, mes);
+                    SendSMSMessage sm = new SendSMSMessage( handler, getAppContext(), new String[]{""}, num, new String[]{mes});
                     sm.sendSMSMessage();
                 }
             });
@@ -145,11 +146,11 @@ interface Functionality
 
 class Contact
 {
-    private String name;
+    private String[] name;
     private String number;
     private Context context;
     private Handler handler;
-    public Contact(Handler handler, Context context, String name, String number)
+    public Contact(Handler handler, Context context, String[] name, String number)
     {
         this.handler = handler;
         this.context = context;
@@ -159,7 +160,7 @@ class Contact
 
     private Context getAppContext(){return this.context;}
 
-    public void setName( String name )
+    public void setName( String[] name )
     {
         this.name = name;
     }
@@ -169,7 +170,7 @@ class Contact
         this.number = number;
     }
 
-    public String getName()
+    public String[] getName()
     {
         return this.name;
     }
@@ -190,7 +191,7 @@ class Contact
 
         }catch( NumberFormatException e )
         {
-            return searchNumber( this.number );
+            return searchNumber(new String[]{this.number} );
             //return null;
         }
 
@@ -207,20 +208,17 @@ class Contact
         });
     }
 
-    public String searchNumber( String name )
+    public ArrayList<String[]> search( String whereClause, String[] selectionArgs)
     {
-        try {
-
+        try
+        {
             String []projection = { ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, ContactsContract.Contacts.Data._ID};
-            String whereClause = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? ";
-
-            String []selectionArgs = { "%" + name + "%"};
 
             ContentResolver cr = getAppContext().getContentResolver();
 
             Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, projection, whereClause, selectionArgs, null);
 
-            String data = "";
+            //String data = "";
             ArrayList<String[]> contacts = new ArrayList<>();
 
             int nameIndex = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY);
@@ -254,32 +252,94 @@ class Contact
                     }
                     while( cursor.moveToNext() );
 
-                    for( String[] contact : contacts )
-                    {
-                        data += contact[0] + "  " + contact[1] + "\n\n";
-                    }
                 }
-                else
-                {
-                    data += "no contacts match your search";
-                }
+
             }
 
             cursor.close();
 
+            return contacts;
+
             //Toast.makeText(getAppContext(), "Found:\n" + data, Toast.LENGTH_LONG).show();
+        }catch( Exception e )
+        {
+            postToUI("Error: " + e);
+        }
 
-           if( contacts.size() == 1 )
-           {
-               postToUI("One Contact found!");
-               return contacts.get( 0 )[1];
-           }
-           else
-           {
-               return "Found " + contacts.size() + " contacts: \n" + data;
-           }
+        return new ArrayList<String[]>();
+    }
 
-        }catch(Exception e )
+    public String searchNumber( String[] name )
+    {
+        try {
+            String whereClause;
+
+            String []selectionArgs;
+            ArrayList<String[]> contacts;
+            String data = "";
+
+            switch( name.length )
+            {
+                case 1:
+                    whereClause = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? ";
+                    selectionArgs = new String[]{ name[0] };
+                    contacts = search( whereClause, selectionArgs );
+
+                    if( contacts.size() == 0 )
+                    {
+                        selectionArgs = new String[]{"%" + name[0] + "%"};
+                        contacts = search( whereClause, selectionArgs );
+                    }
+                    //process contacts
+                    break;
+                case 2:
+                    whereClause = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? AND " + ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? ";
+                    selectionArgs = new String[]{ "%" + name[0] + "%", "%" + name[1] + "%"};
+                    contacts = search( whereClause, selectionArgs );
+                    break;
+                case 3:
+                    whereClause = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? AND " + ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? AND " + ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? " ;
+                    selectionArgs = new String[]{ "%" + name[0] + "%", "%" + name[1] + "%", "%" + name[2] + "%"};
+                    contacts = search( whereClause, selectionArgs );
+                    break;
+                default:
+                    whereClause = ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " LIKE ? ";
+                    String contactName = "";
+                    //concat all names and search
+                    for( String n : name)
+                        contactName += n + " ";
+
+                    selectionArgs = new String[]{ "%" + contactName + "%"};
+                    contacts = search( whereClause, selectionArgs );
+            }
+
+            if( contacts.size() > 0 )
+            {
+                for( String[] contact : contacts )
+                {
+                    data += contact[0] + "  " + contact[1] + "\n\n";
+                }
+            }
+            else
+            {
+                data += "no contacts match your search";
+            }
+
+            if( contacts.size() == 1 )
+            {
+                postToUI("One Contact found!" + contacts.get(0)[1]);
+                return contacts.get( 0 )[1];
+            }
+            else
+            {
+                return "Found " + contacts.size() + " contacts: \n" + data;
+            }
+
+        }catch( ArrayIndexOutOfBoundsException iex)
+        {
+            postToUI("Index out of bounds exception when reading contact number!");
+        }
+        catch(Exception e )
         {
             //Toast.makeText(getAppContext(), "Error: " + e, Toast.LENGTH_SHORT).show();
             postToUI("Error: " + e);
@@ -379,7 +439,7 @@ class CallPhone //implements Functionality
     private Contact contact;
     private Context context;
     private Handler handler;
-    public CallPhone(Handler handler, Context context, String name, String number)
+    public CallPhone(Handler handler, Context context, String[] name, String number)
     {
         this.handler = handler;
         contact = new Contact(handler, context, name, number);
@@ -445,16 +505,16 @@ class CallPhone //implements Functionality
 class SendSMSMessage //extends BroadcastReceiver //implements Functionality
 {
     private Contact contact;
-    private String message;
+    private String []statement;
     private Context context;
     private Handler handler;
 
-    public SendSMSMessage(Handler handler, Context context, String name, String number, String message)
+    public SendSMSMessage(Handler handler, Context context, String []name, String number, String []statement)
     {
         this.handler = handler;
         this.context = context;
         contact = new Contact(handler, context, name, number);
-        this.message = message;
+        this.statement = statement;
     }
 
     private void postToUI(String message)
@@ -467,15 +527,71 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
         });
     }
 
-    public String getMessage() {
-        return this.message;
+    public String getMessage()
+    {
+        String message = "";
+
+        for( String s : statement )
+            message += s + " ";
+
+        return message;
+    }
+
+    private String getNumber( int names) {
+        String number = new String(contact.getNumber());
+
+        String internationalPhoneNumberRegex = "^\\+(?:[0-9]?){6,14}[0-9]$";
+        String internationalPhoneNumberWithSpacesRegex = "^\\+([0-9]){1,3}\\s[0-9]{1,3}\\s[0-9]{4,8}$";
+        String kenyanPhoneNumberRegex = "^0[17](?:[0-9]){8}";
+
+        if( number.matches(internationalPhoneNumberRegex) || number.matches( internationalPhoneNumberWithSpacesRegex ) || number.matches(kenyanPhoneNumberRegex) )
+        {
+            postToUI("Number is valid!" + number);
+            return number;
+        }
+        else
+        {
+            postToUI("Number does not match regex! " + number);
+            if( names <= 3 && statement.length <= names)
+            {
+                try
+                {
+                    int num = Integer.parseInt( number );
+                }catch( NumberFormatException ex )
+                {
+                    String []n = this.statement;
+                    String []name = contact.getName();
+
+                    String []newName = new String[name.length + 1];
+
+                    for( int i = 0; i < name.length; i++ )
+                        newName[i] = name[i];
+
+                    newName[ name.length ] = n[0];
+
+                    statement = Arrays.copyOfRange( statement, 1, statement.length);
+
+                    contact.setName( newName );
+
+                    return getNumber( names + 1 );
+                }catch( Exception e )
+                {
+                    postToUI("Error: " + e);
+                }
+            }
+        }
+
+        return null;
     }
 
     public void sendSMSMessage() {
-        if (contact.getNumber() == null)
-            return;
+        try
+        {
+            String number = getNumber(1);
+            if ( number == null)
+                return;
+            //ResponseQueue.enqueue(getAppContext(), number);
 
-        try {
             if (ActivityCompat.checkSelfPermission(getAppContext(), android.Manifest.permission.SEND_SMS)
                     != PackageManager.PERMISSION_GRANTED) {
                 //ActivityCompat.requestPermissions( getAppContext(), new String[]{Manifest.permission.SEND_SMS}, 0);
@@ -484,16 +600,19 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
             }
 
             Intent sent = new Intent("SMS_SENT");
-            sent.putExtra("recipient", contact.getNumber());
+            sent.putExtra("recipient", number);
             Intent delivered = new Intent("SMS_DELIVERED");
-            delivered.putExtra("recipient", contact.getNumber());
+            delivered.putExtra("recipient", number);
             PendingIntent sentIntent = PendingIntent.getBroadcast(getAppContext(), 0, sent, 0);
             PendingIntent deliveredIntent = PendingIntent.getBroadcast(getAppContext(), 0, delivered, 0);
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(contact.getNumber(), null, getMessage(), sentIntent, deliveredIntent);
+            smsManager.sendTextMessage(number, null, getMessage(), sentIntent, deliveredIntent);
 
-        } catch (Exception e) {
-            //Toast.makeText(getAppContext(),"Error: " + e, Toast.LENGTH_SHORT).show();
+        }catch(ArrayIndexOutOfBoundsException iex )
+        {
+            postToUI("index out of bounds exception while sending message!");
+        }catch (Exception e)
+        {
             postToUI("Error: " + e);
         }
     }

@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
 
+import java.util.Arrays;
+
 public class ExecuteCommand implements Runnable {
 
     private Thread thread;
@@ -67,7 +69,7 @@ public class ExecuteCommand implements Runnable {
             while( !CommandQueue.isEmpty() )
             {
                 command = CommandQueue.dequeue();
-                postToUI("Command = " + command.getCommand() + "\nArg = " + command.getArg());
+                //postToUI("Command = " + command.getCommand() + "\nArg = " + command.getArg());
 
                 if( command.getCommand().equals("") )//if empty command, no need of processing the statement
                     continue;
@@ -89,19 +91,10 @@ public class ExecuteCommand implements Runnable {
                                 wrongCommand(statement);
                         }
                         break;
-                    case "create":
+                    case "create", "save":
                         createContact(statement);
                         break;
-                    case "save":
-                        createContact(statement);
-                        break;
-                    case "text":
-                        sendSMS(statement);
-                        break;
-                    case "sms":
-                        sendSMS(statement);
-                        break;
-                    case "message":
+                    case "text", "sms", "message":
                         sendSMS(statement);
                         break;
                     default:
@@ -123,7 +116,16 @@ public class ExecuteCommand implements Runnable {
             postToUI("Making phone call");
             if( statement.length > 1 )
             {
-                CallPhone cp = new CallPhone( handler, getAppContext(), statement[1], "");
+                String []contactName = new String[statement.length - 1];
+
+                for( int i = 0; i < statement.length; i++)
+                {
+                    if( (i + 1) < statement.length ) {
+                        contactName[i] = new String( statement[i + 1] );
+                        postToUI("" + contactName[i]);
+                    }
+                }
+                CallPhone cp = new CallPhone( handler, getAppContext(), contactName, "");
                 cp.callPhone();
             }
             else
@@ -158,6 +160,30 @@ public class ExecuteCommand implements Runnable {
     private void sendSMS(String []statement)
     {
         postToUI("sending sms");
+        try
+        {
+            if( statement.length > 2 )
+            {
+                String []name = new String[]{ new String(statement[1])};
+
+                String []state = Arrays.copyOfRange( statement, 1, statement.length );
+
+                SendSMSMessage send = new SendSMSMessage(handler, getAppContext(), name, "", state);
+                send.sendSMSMessage();
+            }
+            else if( statement.length == 2 )
+            {
+                postToUI("Please specify a message to send!");
+            }
+            else
+            {
+                postToUI("Please specify the contact to message and the message to send!");
+            }
+
+        }catch( Exception e )
+        {
+            postToUI("Error: " + e);
+        }
     }
     private void createContact(String []statement)
     {
