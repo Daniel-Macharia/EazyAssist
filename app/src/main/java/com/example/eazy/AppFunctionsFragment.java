@@ -542,9 +542,11 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
 
         String internationalPhoneNumberRegex = "^\\+(?:[0-9]?){6,14}[0-9]$";
         String internationalPhoneNumberWithSpacesRegex = "^\\+([0-9]){1,3}\\s[0-9]{1,3}\\s[0-9]{4,8}$";
-        String kenyanPhoneNumberRegex = "^0[17](?:[0-9]){8}";
+        String kenyanPhoneNumberRegex = "^0[17](?:[0-9]){8}&";
+        String kenyanPhoneRegexWithSpace = "^0[17](?:[0-9]?){2}\\s[0-9]{6}$";
 
-        if( number.matches(internationalPhoneNumberRegex) || number.matches( internationalPhoneNumberWithSpacesRegex ) || number.matches(kenyanPhoneNumberRegex) )
+        if( number.matches(internationalPhoneNumberRegex) || number.matches( internationalPhoneNumberWithSpacesRegex )
+                || number.matches(kenyanPhoneNumberRegex) || number.matches( kenyanPhoneRegexWithSpace ) )
         {
             postToUI("Number is valid!" + number);
             return number;
@@ -552,7 +554,7 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
         else
         {
             postToUI("Number does not match regex! " + number);
-            if( names <= 3 && statement.length <= names)
+            if( names <= 3 && names <= statement.length)
             {
                 try
                 {
@@ -572,6 +574,7 @@ class SendSMSMessage //extends BroadcastReceiver //implements Functionality
                     statement = Arrays.copyOfRange( statement, 1, statement.length);
 
                     contact.setName( newName );
+                    postToUI("recurring to search further. Names: " + names);
 
                     return getNumber( names + 1 );
                 }catch( Exception e )
