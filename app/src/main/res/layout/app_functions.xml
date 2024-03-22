@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cream"
+    android:background="@drawable/message_bot"
     >
 
     <LinearLayout
@@ -28,6 +28,9 @@
             android:layout_height="100dp"
             android:orientation="horizontal"
             android:gravity="center"
+            android:background="@drawable/rounded_rect"
+            android:backgroundTint="@color/holo_blue_dark"
+            android:layout_margin="8dp"
             >
             <EditText
                 android:id="@+id/callNumber"
@@ -48,9 +51,10 @@
                 android:layout_weight="1"
                 android:text="call"
                 android:textSize="24sp"
-                android:textColor="@color/purple"
+                android:textColor="@color/orange"
                 android:gravity="center"
-                android:background="@color/green"
+                android:background="@drawable/rounded_rect"
+                android:backgroundTint="@color/darkGreen"
                 android:layout_margin="8dp"
                 />
 
@@ -71,15 +75,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:gravity="center"
+            android:background="@drawable/rounded_rect"
+            android:backgroundTint="@color/holo_blue_dark"
+            android:layout_margin="8dp"
             >
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal"
                 android:gravity="center"
                 android:paddingEnd="16dp"
                 android:paddingStart="16dp"
@@ -87,47 +94,50 @@
 
                 <EditText
                     android:id="@+id/smsNumber"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
                     android:layout_weight="2"
                     android:inputType="text"
                     android:hint="Enter phone number here"
                     android:textColor="@color/blue"
                     android:textColorHint="@color/grey"
-                    android:layout_margin="8dp"
-                    />
-                <EditText
-                    android:id="@+id/smsMessage"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="2"
-                    android:inputType="textAutoComplete|textMultiLine"
-                    android:hint="Enter message here"
-                    android:textColor="@color/blue"
-                    android:textColorHint="@color/grey"
-                    android:layout_margin="8dp"
+                    android:gravity="start|top"
                     />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center|bottom"
-                android:paddingBottom="8dp"
-                >
                 <Button
                     android:id="@+id/send"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="send"
                     android:textSize="24sp"
-                    android:textColor="@color/purple"
+                    android:textColor="@color/orange"
                     android:gravity="center"
-                    android:background="@color/green"
-                    android:layout_margin="8dp"
+                    android:background="@drawable/rounded_rect"
+                    android:backgroundTint="@color/darkGreen"
                     />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:gravity="center|bottom"
+                android:paddingBottom="8dp"
+                >
+
+                <EditText
+                    android:id="@+id/smsMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:inputType="textAutoComplete|textMultiLine"
+                    android:hint="Enter message here"
+                    android:textColor="@color/blue"
+                    android:textColorHint="@color/grey"
+                    android:gravity="start|top"
+                    />
+
             </LinearLayout>
 
         </LinearLayout>
@@ -145,21 +155,13 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:orientation="horizontal"
+            android:layout_height="240dp"
+            android:orientation="vertical"
             android:gravity="center"
+            android:layout_margin="8dp"
+            android:background="@drawable/rounded_rect"
+            android:backgroundTint="@color/holo_blue_dark"
             >
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:paddingEnd="16dp"
-                android:paddingStart="16dp"
-                >
-
                 <EditText
                     android:id="@+id/name"
                     android:layout_width="match_parent"
@@ -169,7 +171,7 @@
                     android:hint="Enter name here"
                     android:textColor="@color/blue"
                     android:textColorHint="@color/grey"
-                    android:layout_margin="8dp"
+                    android:gravity="start|top"
                     />
                 <EditText
                     android:id="@+id/number"
@@ -180,30 +182,20 @@
                     android:hint="Enter number here"
                     android:textColor="@color/blue"
                     android:textColorHint="@color/grey"
-                    android:layout_margin="8dp"
+                    android:gravity="start|top"
                     />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center|bottom"
-                android:paddingBottom="8dp"
-                >
                 <Button
                     android:id="@+id/saveContact"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="save"
                     android:textSize="24sp"
-                    android:textColor="@color/purple"
+                    android:textColor="@color/orange"
                     android:gravity="center"
-                    android:background="@color/green"
+                    android:background="@drawable/rounded_rect"
+                    android:backgroundTint="@color/darkGreen"
                     android:layout_margin="8dp"
                     />
-            </LinearLayout>
 
         </LinearLayout>
 
@@ -220,9 +212,12 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="80dp"
             android:orientation="horizontal"
             android:gravity="center"
+            android:layout_margin="8dp"
+            android:background="@drawable/rounded_rect"
+            android:backgroundTint="@color/holo_blue_dark"
             >
 
             <Button
@@ -232,18 +227,14 @@
                 android:layout_weight="1"
                 android:text="Switch Flashlight "
                 android:textSize="24sp"
-                android:textColor="@color/purple"
+                android:textColor="@color/orange"
                 android:gravity="center"
-                android:background="@color/green"
-                android:layout_margin="8dp"
+                android:background="@drawable/rounded_rect"
+                android:backgroundTint="@color/darkGreen"
                 />
 
 
         </LinearLayout>
-
     </LinearLayout>
-
-
-
 
 </ScrollView>
