@@ -18,6 +18,8 @@ public class LoginActivity extends AppCompatActivity {
     {
         super.onCreate( savedInstanceState );
 
+        HomeActivity.es = new EazySpeak(getApplicationContext());
+
         User user = new User( getApplicationContext() );
         user.open();
         boolean exists = user.userExists();

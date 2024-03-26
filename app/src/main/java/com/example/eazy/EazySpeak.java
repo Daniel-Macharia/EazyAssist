@@ -13,13 +13,16 @@ public class EazySpeak implements Runnable, TextToSpeech.OnInitListener {
     private TextToSpeech tts;
     private Context context;
     private Thread thread;
+    private boolean isInitialized = false;
 
     public EazySpeak(Context context)
     {
         this.context = context;
         tts = new TextToSpeech( getAppContext(), this);
         thread = null;
+        this.isInitialized = true;
     }
+    public boolean isTTSInitialized(){return this.isInitialized;}
 
     public void startExecutingCommands()
     {
@@ -62,9 +65,9 @@ public class EazySpeak implements Runnable, TextToSpeech.OnInitListener {
         switch( status )
         {
             case TextToSpeech.SUCCESS:
-                Toast.makeText(getAppContext(), "Successfully initialized the TTS engine!", Toast.LENGTH_SHORT).show();
-               // speak("Hello World!");
-               // speak("Hello Java!");
+                //Toast.makeText(getAppContext(), "Successfully initialized the TTS engine!", Toast.LENGTH_SHORT).show();
+                //speak("Welcome " + details[0] + ". I am Eazy. How may I help you?");
+                //speak("Hello Java!");
                 //speak("#Eazy Response");
                 //speak("#Android Development");
                 break;

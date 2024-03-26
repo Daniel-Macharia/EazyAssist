@@ -92,7 +92,13 @@ public class ExecuteCommand implements Runnable {
                         }
                         break;
                     case "create", "save":
-                        createContact(statement);
+                        switch( statement[1] ){
+                            case "contact" :
+                                createContact(Arrays.copyOfRange( statement, 2, statement.length - 1));
+                                break;
+                            default:
+                                createContact( Arrays.copyOfRange(statement, 1, statement.length - 1) );
+                        }
                         break;
                     case "text", "sms", "message":
                         sendSMS(statement);
@@ -187,6 +193,30 @@ public class ExecuteCommand implements Runnable {
     }
     private void createContact(String []statement)
     {
+        try
+        {
+            String tel = "";
+            String name = "";
+
+            int index = 0;
+            for( String val : statement )
+            {
+                if( val.equals("as") )
+                    break;
+                tel += HomeActivity.nm.getNumber( val );
+                index++;
+            }
+
+            for( int i = index; i < statement.length; i++)
+            {
+                name += new String( statement[i] ) + " ";
+            }
+
+            postToUI("Name: " + name + "\nPhone Number: " + tel);
+        }catch( Exception e )
+        {
+            postToUI("Error: " + e);
+        }
         postToUI("Creating contact");
     }
 

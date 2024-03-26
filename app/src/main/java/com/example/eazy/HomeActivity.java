@@ -26,6 +26,7 @@ public class HomeActivity extends AppCompatActivity {
     private TabLayout tabs;
     private ViewPager pager;
     private ImageView menu_popup;
+    public static NumberMap nm;
 
     /* Used to handle permission request */
     private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
@@ -44,6 +45,9 @@ public class HomeActivity extends AppCompatActivity {
 
         menu_popup = findViewById( R.id.menu_popup );
 
+        nm = new NumberMap(getApplicationContext());
+
+
         menu_popup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -52,10 +56,20 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         try {
+            User user = new User(getApplicationContext());
+            user.open();
+            String []details = user.getUserDetails();
+            user.close();
+
             vm = new VoskModel( getApplicationContext(), new Handler( Looper.getMainLooper()));
             ec = new ExecuteCommand( getApplicationContext() );
-            es = new EazySpeak(getApplicationContext());
-            //es.speak("Hello World!");
+            es.speak("Welcome " + details[0] + ". I am Eazy. How may I help you?");
+            //es = new EazySpeak(getApplicationContext());
+
+            if( !vm.isReady() || !es.isTTSInitialized() )
+            {
+                Toast.makeText(getApplicationContext(), "Please wait as we initialize Eazy!", Toast.LENGTH_LONG).show();
+            }
         }catch( Exception e )
         {
             Toast.makeText(this, "Error: " + e, Toast.LENGTH_SHORT).show();
@@ -107,7 +121,7 @@ public class HomeActivity extends AppCompatActivity {
         });
 
 
-
+        nm.display();
     }
 
     private void showPopUpMenu(View view)
@@ -152,10 +166,6 @@ public class HomeActivity extends AppCompatActivity {
         requestRecordAudioPermission();
         requestWriteContactsPermission();*/
 
-        if( ActivityCompat.checkSelfPermission( this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.RECORD_AUDIO}, 1);
-        }
 
         //request other permissions
         {
@@ -168,7 +178,8 @@ public class HomeActivity extends AppCompatActivity {
                             Manifest.permission.SEND_SMS,
                             Manifest.permission.POST_NOTIFICATIONS,
                             Manifest.permission.ACCESS_NETWORK_STATE,
-                            Manifest.permission.INTERNET
+                            Manifest.permission.INTERNET,
+                            Manifest.permission.RECORD_AUDIO
                     },
                     1);
         }

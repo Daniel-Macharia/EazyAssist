@@ -48,6 +48,8 @@ public class VoskModel implements RecognitionListener/*, Runnable */{
         isListening = false;
     }
 
+    public boolean isReady(){return this.isReady;}
+
     public void startListening()
     {
         try
